@@ -48,9 +48,9 @@ paredes_mapa2 = [
     pygame.Rect(0, 0, 700, 40),
 
     # arriba derecha
-    pygame.Rect(1200, 0, 800, 40)
+    pygame.Rect(1200, 0, constantes.ANCHO_VENTANA - 1200, 40),
 
-]
+    ]
 
 # hueco / salida mapa 2
 salida_mapa2 = pygame.Rect( 700, 0, 500, 40)

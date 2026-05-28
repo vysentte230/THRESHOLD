@@ -37,11 +37,15 @@ fuente_boton = pygame.font.SysFont("Arial", 50)
 
 run = True
 mostrar_hitbox = False
+cooldown_mapa = 0
 
 while run == True:
 
     # indicar que vaya a 60 fps
     reloj.tick(constantes.FPS)
+
+    if cooldown_mapa > 0:
+      cooldown_mapa -= 1
 
     ventana.fill(constantes.COLOR_BG)
 
@@ -100,19 +104,23 @@ while run == True:
         jugador.movimiento(delta_x, delta_y, paredes)
 
         # cambiar mapa
-        if jugador.forma.colliderect(salida):
+        if jugador.forma.colliderect(salida) and cooldown_mapa == 0:
 
             if mapas.mapa_actual == 1:
 
                 mapas.mapa_actual = 2
 
+                jugador.forma.x = constantes.ANCHO_VENTANA // 2
                 jugador.forma.y = 100
+                cooldown_mapa = 30
 
             else:
 
                 mapas.mapa_actual = 1
 
+                jugador.forma.x = constantes.ANCHO_VENTANA // 2
                 jugador.forma.y = constantes.ALTO_VENTANA - 200
+                cooldown_mapa = 30
 
         
         # dibujar paredes + colisiones
@@ -125,23 +133,16 @@ while run == True:
                 pared
             )
 
-
-            # caja de colisión
-            pygame.draw.rect(
-                ventana,
-                (255, 0, 0),
-                pared,
-                3
-            )
-
-            # caja de colisión
-            pygame.draw.rect(
-                ventana,
-                (255, 0, 0),
-                pared,
-                3
-            )
-
+               # mostrar hitbox paredes
+            if mostrar_hitbox:
+                   pygame.draw.rect(
+                    ventana,
+                    (255, 0, 0),
+                    pared,
+                    3
+                )
+            
+             
         # dibujar salida
         pygame.draw.rect(
             ventana,
@@ -155,14 +156,14 @@ while run == True:
             jugador.forma
         )
 
-        # colisión jugador
-        pygame.draw.rect(
-            ventana,
-            (0, 255, 0),
-            jugador.forma,
-            3
-        )
-                
+        # hitbox jugador
+        if mostrar_hitbox:
+              pygame.draw.rect(
+                ventana,
+                (0, 255, 0),
+                jugador.forma,
+                3
+            )
 
         # eventos
     for event in pygame.event.get():
@@ -189,6 +190,9 @@ while run == True:
 
         # tecla presionada
         if event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_c:
+                mostrar_hitbox = not mostrar_hitbox
 
             if event.key == pygame.K_a:
                 mover_izquierda = True
