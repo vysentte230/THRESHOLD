@@ -3,9 +3,8 @@ import constantes
 
 mapa_actual = 1
 
-# ======================
 # MAPA 1
-# ======================
+
 
 paredes_mapa1 = [
 
@@ -29,9 +28,9 @@ paredes_mapa1 = [
 # hueco / salida mapa 1
 salida_mapa1 = pygame.Rect(700, constantes.ALTO_VENTANA - 40, 500, 40)
 
-# ======================
+
 # MAPA 2
-# ======================
+
 
 paredes_mapa2 = [
 

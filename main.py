@@ -254,5 +254,4 @@ while run == True:
                 mover_abajo = False
 
     pygame.display.update()
-
 pygame.quit()
