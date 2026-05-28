@@ -114,8 +114,13 @@ while run == True:
  
             velocidad_actual = 2
 
-        # mover jugador
-        jugador.movimiento(delta_x, delta_y, paredes)
+        paredes_con_bus = paredes.copy()
+
+        if mapas.mapa_actual == 1:
+
+            paredes_con_bus.append(bus.rect)
+
+        jugador.movimiento(delta_x, delta_y, paredes_con_bus)
 
         # cambiar mapa
         if jugador.forma.colliderect(salida) and cooldown_mapa == 0:
@@ -159,6 +164,15 @@ while run == True:
         if mapas.mapa_actual == 1:
 
            bus.dibujar(ventana)
+
+           if mostrar_hitbox:
+
+            pygame.draw.rect(
+                ventana,
+                (255, 255, 0),
+                bus.rect,
+                4
+            )
     
         # dibujar salida
         pygame.draw.rect(
@@ -172,6 +186,16 @@ while run == True:
             jugador.image,
             jugador.forma
         )
+
+        # hitbox jugador
+        if mostrar_hitbox:
+
+            pygame.draw.rect(
+                ventana,
+                (0, 255, 0),
+                jugador.forma,
+                4
+            )
 
         # eventos
     for event in pygame.event.get():
