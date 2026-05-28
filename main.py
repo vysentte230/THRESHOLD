@@ -2,8 +2,11 @@ import pygame
 import constantes
 from personaje import Personaje
 import mapas
+from bus import Bus
 
-jugador = Personaje(200, 200,)
+#aqui hace spawn
+jugador = Personaje(1600, 200,)
+bus = Bus(1800, -300)
 
 pygame.init()
 pygame.mixer.init()
@@ -78,16 +81,16 @@ while run == True:
         delta_y = 0
 
         if mover_arriba:
-            delta_y = -constantes.VELOCIDAD
+            delta_y = -velocidad_actual
 
         if mover_abajo:
-            delta_y = constantes.VELOCIDAD
+            delta_y = velocidad_actual
 
         if mover_izquierda:
-            delta_x = -constantes.VELOCIDAD
+            delta_x = -velocidad_actual
 
         if mover_derecha:
-            delta_x = constantes.VELOCIDAD
+            delta_x =  velocidad_actual
 
         # elegir mapa
         if mapas.mapa_actual == 1:
@@ -95,10 +98,21 @@ while run == True:
             paredes = mapas.paredes_mapa1
             salida = mapas.salida_mapa1
 
+            bus.mover()
+            bus.animar()
+
         else:
 
             paredes = mapas.paredes_mapa2
             salida = mapas.salida_mapa2
+
+        velocidad_actual = constantes.VELOCIDAD
+
+        if mapas.mapa_actual == 1:
+
+           if jugador.forma.colliderect(bus.rect):
+ 
+            velocidad_actual = 2
 
         # mover jugador
         jugador.movimiento(delta_x, delta_y, paredes)
@@ -141,8 +155,11 @@ while run == True:
                     pared,
                     3
                 )
-            
-             
+                   
+        if mapas.mapa_actual == 1:
+
+           bus.dibujar(ventana)
+    
         # dibujar salida
         pygame.draw.rect(
             ventana,
@@ -155,15 +172,6 @@ while run == True:
             jugador.image,
             jugador.forma
         )
-
-        # hitbox jugador
-        if mostrar_hitbox:
-              pygame.draw.rect(
-                ventana,
-                (0, 255, 0),
-                jugador.forma,
-                3
-            )
 
         # eventos
     for event in pygame.event.get():
