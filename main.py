@@ -21,7 +21,7 @@ fondo_menu = pygame.transform.scale(fondo_menu,( constantes.ANCHO_VENTANA,consta
 ventana = pygame.display.set_mode((constantes.ANCHO_VENTANA,
                                    constantes.ALTO_VENTANA))
 
-pygame.display.set_caption("A WAY OUT (nombre en desarrollo)")
+pygame.display.set_caption("Threshold")
 
 estado_juego = "menu"
 
@@ -55,7 +55,8 @@ while run == True:
     if estado_juego == "menu":
      ventana.blit(fondo_menu, (0, 0))
 
-     texto_titulo = fuente_titulo.render ("A WAY OUT", True,(255, 255, 255))
+     texto_titulo = fuente_titulo.render ("THRESHOLD", True,(255, 255, 255))
+     
 
      ventana.blit(texto_titulo, (600, 180))
      boton_jugar = pygame.Rect(760, 420, 400, 100)
