@@ -50,10 +50,31 @@ class Personaje():
                                  constantes.ALTO_PERSONAJE)
      self.forma.center = (x, y)
     
-    def movimiento(self, delta_x, delta_y):
+    def movimiento(self, delta_x, delta_y, paredes):
 
+        # movimiento horizontal
         self.forma.x += delta_x
+
+        for pared in paredes:
+            if self.forma.colliderect(pared):
+
+                if delta_x > 0:
+                    self.forma.right = pared.left
+
+                if delta_x < 0:
+                    self.forma.left = pared.right
+
+        # movimiento vertical
         self.forma.y += delta_y
+
+        for pared in paredes:
+            if self.forma.colliderect(pared):
+
+                if delta_y > 0:
+                    self.forma.bottom = pared.top
+
+                if delta_y < 0:
+                    self.forma.top = pared.bottom
 
         moviendo = False
 
@@ -74,7 +95,7 @@ class Personaje():
             self.direccion = "derecha"
             moviendo = True
 
-          # animación
+        # animación
         if moviendo:
 
             self.contador_animacion += 1
