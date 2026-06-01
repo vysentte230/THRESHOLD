@@ -25,7 +25,7 @@ pygame.display.set_caption("Threshold")
 
 estado_juego = "menu"
 
-# variables movimiento
+# varibles movimiento
 mover_arriba = False
 mover_abajo = False
 mover_izquierda = False
@@ -93,7 +93,7 @@ while run == True:
         if mover_derecha:
             delta_x =  velocidad_actual
 
-        # elegir mapa
+        #elegir mapa
         if mapas.mapa_actual == 1:
 
             paredes = mapas.paredes_mapa1
@@ -123,7 +123,7 @@ while run == True:
 
         jugador.movimiento(delta_x, delta_y, paredes_con_bus)
 
-        # cambiar mapa
+        #cambiar mapa
         if jugador.forma.colliderect(salida) and cooldown_mapa == 0:
 
             if mapas.mapa_actual == 1:
@@ -143,7 +143,7 @@ while run == True:
                 cooldown_mapa = 30
 
         
-        # dibujar paredes + colisiones
+        # dibujar paredes mas colisiones
         for pared in paredes:
 
             # pared visible
@@ -198,14 +198,14 @@ while run == True:
                 4
             )
 
-        # eventos
+    
     for event in pygame.event.get():
 
         # cerrar ventana
         if event.type == pygame.QUIT:
             run = False
 
-        # click mouse
+        # clickear mouse
         if event.type == pygame.MOUSEBUTTONDOWN:
 
             if estado_juego == "menu":
@@ -221,7 +221,7 @@ while run == True:
 
                     run = False
 
-        # tecla presionada
+        #al presionar
         if event.type == pygame.KEYDOWN:
 
             if event.key == pygame.K_c:

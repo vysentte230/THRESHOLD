@@ -30,7 +30,7 @@ class Bus():
 
         self.rect.y += self.velocidad
 
-        # reaparecer arriba
+        # reaparecer arriba(lo usare con otros vehiculos)
         if self.rect.y > 1200:
 
             self.velocidad = 0
