@@ -4,12 +4,13 @@ from personaje import Personaje
 import mapas
 from bus import Bus
 
+pygame.init()
+pygame.mixer.init()
+
 #aqui hace spawn
 jugador = Personaje(1600, 200,)
 bus = Bus(1800, -300)
 
-pygame.init()
-pygame.mixer.init()
 
 fondo_menu = pygame.image.load("assets//images/Menu//Menu.png")
 pygame.mixer.music.load("assets//music//musica//EmptyTown_DELTARUNE.mp3")
