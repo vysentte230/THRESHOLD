@@ -7,31 +7,31 @@ class Personaje():
      self.animaciones = {}
     
      self.animaciones["abajo"] = [
-    pygame.image.load("assets/images/character/Player/Player.png"),
-    pygame.image.load("assets/images/character/Player/frente2.png"),
-    pygame.image.load("assets/images/character/Player/frente3.png"),
-    pygame.image.load("assets/images/character/Player/frente4.png")
+    pygame.image.load("assets/images/character/Player/Modelo_1/Abajo/abajo1_1.png"),
+    pygame.image.load("assets/images/character/Player/Modelo_1/Abajo/abajo1_2.png"),
+    pygame.image.load("assets/images/character/Player/Modelo_1/Abajo/abajo1_3.png"),
+    pygame.image.load("assets/images/character/Player/Modelo_1/Abajo/abajo1_4.png"),
      ]
 
      self.animaciones["arriba"] = [
-    pygame.image.load("assets/images/character/Player/Arriba1.png"),
-    pygame.image.load("assets/images/character/Player/arriba2.png"),
-    pygame.image.load("assets/images/character/Player/arriba3.png"),
-    pygame.image.load("assets/images/character/Player/arriba4.png")
+    pygame.image.load("assets/images/character/Player/Modelo_1/Arriba/arriba1_1.png"),
+    pygame.image.load("assets/images/character/Player/Modelo_1/Arriba/arriba1_2.png"),
+    pygame.image.load("assets/images/character/Player/Modelo_1/Arriba/arriba1_3.png"),
+    pygame.image.load("assets/images/character/Player/Modelo_1/Arriba/arriba1_4.png"),
      ]
 
      self.animaciones["izquierda"] = [
-    pygame.image.load("assets/images/character/Player/izquierda1.png"),
-    pygame.image.load("assets/images/character/Player/izquierda2.png"),
-    pygame.image.load("assets/images/character/Player/izquierda3.png"),
-    pygame.image.load("assets/images/character/Player/izquierda4.png")
+    pygame.image.load("assets/images/character/Player/Modelo_1/Izquierda/izquierda1_1.png"),
+    pygame.image.load("assets/images/character/Player/Modelo_1/Izquierda/izquierda1_2.png"),
+    pygame.image.load("assets/images/character/Player/Modelo_1/Izquierda/izquierda1_3.png"),
+    pygame.image.load("assets/images/character/Player/Modelo_1/Izquierda/izquierda1_4.png"),
      ]
 
      self.animaciones["derecha"] = [
-    pygame.image.load("assets/images/character/Player/derecha1.png"),
-    pygame.image.load("assets/images/character/Player/derecha2.png"),
-    pygame.image.load("assets/images/character/Player/derecha3.png"),
-    pygame.image.load("assets/images/character/Player/derecha4.png")
+    pygame.image.load("assets/images/character/Player/Modelo_1/Derecha/derecha1_1.png"),
+    pygame.image.load("assets/images/character/Player/Modelo_1/Derecha/derecha1_2.png"),
+    pygame.image.load("assets/images/character/Player/Modelo_1/Derecha/derecha1_3.png"),
+    pygame.image.load("assets/images/character/Player/Modelo_1/Derecha/derecha1_4.png"),
      ]
 
      # dirección actual
