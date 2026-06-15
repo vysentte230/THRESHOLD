@@ -57,9 +57,13 @@ class Personaje():
      # velocidad animación
      self.contador_animacion = 0
 
-     self.forma = pygame.Rect(0, 0, constantes.ANCHO_PERSONAJE,
-                                 constantes.ALTO_PERSONAJE)
+     # hitbox del personaje ajustada al sprite animado
+     self.forma = pygame.Rect(0, 0, int(constantes.ANCHO_PERSONAJE * 0.8), int(constantes.ALTO_PERSONAJE * 0.85))
      self.forma.center = (x, y)
+     self.sprite_offset = pygame.math.Vector2(
+         (constantes.ANCHO_PERSONAJE - self.forma.width) // 2,
+         (constantes.ALTO_PERSONAJE - self.forma.height) // 2
+     )
     
     def movimiento(self, delta_x, delta_y, paredes):
 
@@ -123,7 +127,10 @@ class Personaje():
             self.image = self.animaciones[self.direccion][self.frame]
    
     def dibujar(self, interfaz):
-        interfaz.blit(self.image, self.forma)
+        interfaz.blit(
+            self.image,
+            (self.forma.x - self.sprite_offset.x, self.forma.y - self.sprite_offset.y)
+        )
         
         
 
