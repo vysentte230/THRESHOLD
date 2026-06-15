@@ -34,6 +34,17 @@ class Personaje():
     pygame.image.load("assets/images/character/Player/Modelo_1/Derecha/derecha1_4.png"),
      ]
 
+     # Escalar todas las imágenes del personaje
+     for direccion in self.animaciones:
+         for i in range(len(self.animaciones[direccion])):
+             self.animaciones[direccion][i] = pygame.transform.scale(
+                 self.animaciones[direccion][i],
+                 (
+                     constantes.ANCHO_PERSONAJE,
+                     constantes.ALTO_PERSONAJE
+                 )
+             )
+
      # dirección actual
      self.direccion = "abajo"
 

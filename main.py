@@ -14,8 +14,7 @@ pygame.mixer.init()
 
 #aqui hace spawn
 jugador = Personaje(constantes.ANCHO_VENTANA // 2, 200)
-bus = Bus(constantes.ANCHO_VENTANA // 2, -300)
-
+bus = Bus(1800, -300)
 
 fondo_menu = pygame.image.load("assets//images/Menu//Menu.png")
 pygame.mixer.music.load("assets//music//musica//EmptyTown_DELTARUNE.mp3")
