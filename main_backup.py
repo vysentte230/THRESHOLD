@@ -7,7 +7,7 @@ import constantes
 from personaje import Personaje
 import mapas
 from bus import Bus
-#hola brayan
+
 pygame.init()
 pygame.mixer.init()
 

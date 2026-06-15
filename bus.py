@@ -1,4 +1,6 @@
+import constantes
 import pygame
+
 
 class Bus():
 
@@ -31,7 +33,7 @@ class Bus():
         self.rect.y += self.velocidad
 
         # reaparecer arriba(lo usare con otros vehiculos)
-        if self.rect.y > 1200:
+        if self.rect.y > constantes.ALTO_VENTANA:
 
             self.velocidad = 0
 
