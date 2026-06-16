@@ -28,9 +28,29 @@ pantalla = pygame.display.set_mode((constantes.ANCHO_PANTALLA, constantes.ALTO_P
 
 pygame.display.set_caption("Threshold")
 
+
+# Configuración mapa 1
+
+MAPA1_SCALE_X = 1.0
+MAPA1_SCALE_Y = 1.0
+
+MAPA1_OFFSET_X = 0
+MAPA1_OFFSET_Y = 0
+
+mapa1_img = pygame.transform.scale(
+    mapas.mapa1_img,
+    (
+        int(constantes.ANCHO_VENTANA * MAPA1_SCALE_X),
+        int(constantes.ALTO_VENTANA * MAPA1_SCALE_Y)
+    )
+)
+
+mapa1_w, mapa1_h = mapa1_img.get_size()
+
+
 # Configuración del mapa 4
-MAPA4_SCALE_X = 2.25
-MAPA4_SCALE_Y = 2.0
+MAPA4_SCALE_X = 2.60
+MAPA4_SCALE_Y = 1.9
 MAPA4_OFFSET_X = 100
 MAPA4_OFFSET_Y = -60
 mapa4_img = pygame.transform.scale(
@@ -78,6 +98,68 @@ def dibujar_texto_glow(ventana, texto, fuente, color, pos, intensidad=4, alpha_g
         ventana.blit(superficie_glow, (x + dx, y + dy))
 
     ventana.blit(superficie, (x, y))
+
+
+def obtener_variables_mapa(mapa):
+    salida_abajo = None
+    salida_izquierda = None
+
+    if mapa == 1:
+        paredes = mapas.paredes_mapa1
+        salida = mapas.salida_mapa1
+    elif mapa == 2:
+        paredes = mapas.paredes_mapa2
+        salida = mapas.salida_mapa2
+        salida_abajo = mapas.salida_mapa2_abajo
+    elif mapa == 3:
+        paredes = mapas.paredes_mapa3
+        salida = mapas.salida_mapa3
+        salida_izquierda = mapas.salida_mapa3_izquierda
+        salida_abajo = mapas.salida_mapa3_abajo
+    elif mapa == 4:
+        paredes = mapas.paredes_mapa4
+        salida = mapas.salida_mapa4_derecha
+        salida_izquierda = mapas.salida_mapa4_izquierda
+    elif mapa == 5:
+        paredes = mapas.paredes_mapa5
+        salida = mapas.salida_mapa5
+    elif mapa == 6:
+        paredes = mapas.paredes_oficina_profesores
+        salida = mapas.salida_oficina_profesores
+    elif mapa == 7:
+        paredes = mapas.paredes_mapa7
+        salida = mapas.salida_mapa7
+        salida_abajo = mapas.salida_mapa7_abajo
+    elif mapa == 8:
+        paredes = mapas.paredes_mapa8
+        salida = mapas.salida_mapa8
+    elif mapa == 9:
+        paredes = mapas.paredes_mapa9
+        salida = mapas.salida_mapa9
+    elif mapa == 10:
+        paredes = mapas.paredes_edificio
+        salida = mapas.puerta_izquierda
+    else:
+        paredes = mapas.paredes_mapa1
+        salida = mapas.salida_mapa1
+
+    return paredes, salida, salida_izquierda, salida_abajo
+
+
+def posicionar_jugador_entrada(salida_rect, lado, jugador):
+    if lado == "arriba":
+        jugador.forma.centerx = salida_rect.centerx
+        jugador.forma.centery = salida_rect.bottom + jugador.forma.height // 2 + 30
+    elif lado == "abajo":
+        jugador.forma.centerx = salida_rect.centerx
+        jugador.forma.centery = salida_rect.top - jugador.forma.height // 2 - 30
+    elif lado == "izquierda":
+        jugador.forma.centerx = salida_rect.right + jugador.forma.width // 2 + 30
+        jugador.forma.centery = salida_rect.centery
+    elif lado == "derecha":
+        jugador.forma.centerx = salida_rect.left - jugador.forma.width // 2 - 30
+        jugador.forma.centery = salida_rect.centery
+
 run = True
 mostrar_hitbox = False
 cooldown_mapa = 0
@@ -166,45 +248,13 @@ while run == True:
         salida_abajo = None
         salida_izquierda = None
 
+        paredes, salida, salida_izquierda, salida_abajo = obtener_variables_mapa(mapas.mapa_actual)
+
         if mapas.mapa_actual == 1:
-            paredes = mapas.paredes_mapa1
-            salida = mapas.salida_mapa1
             bus.mover()
             bus.animar()
             if jugador.forma.colliderect(bus.rect):
                 velocidad_actual = 2
-        elif mapas.mapa_actual == 2:
-            paredes = mapas.paredes_mapa2
-            salida = mapas.salida_mapa2
-            salida_abajo = mapas.salida_mapa2_abajo
-        elif mapas.mapa_actual == 3:
-            paredes = mapas.paredes_mapa3
-            salida = mapas.salida_mapa3
-            salida_izquierda = mapas.salida_mapa3_izquierda
-            salida_abajo = mapas.salida_mapa3_abajo
-        elif mapas.mapa_actual == 4:
-            paredes = mapas.paredes_mapa4
-            salida = mapas.salida_mapa4_derecha
-            salida_izquierda = mapas.salida_mapa4_izquierda
-        elif mapas.mapa_actual == 5:
-            paredes = mapas.paredes_mapa5
-            salida = mapas.salida_mapa5
-        elif mapas.mapa_actual == 7:
-            paredes = mapas.paredes_mapa7
-            salida = mapas.salida_mapa7
-            salida_abajo = mapas.salida_mapa7_abajo
-        elif mapas.mapa_actual == 8:
-            paredes = mapas.paredes_mapa8
-            salida = mapas.salida_mapa8
-        elif mapas.mapa_actual == 9:
-            paredes = mapas.paredes_mapa9
-            salida = mapas.salida_mapa9
-        elif mapas.mapa_actual == 10:
-            paredes = mapas.paredes_edificio
-            salida = mapas.puerta_izquierda    
-        else:
-            paredes = mapas.paredes_mapa1
-            salida = mapas.salida_mapa1
 
         paredes_con_bus = paredes.copy()
         if mapas.mapa_actual == 1:
@@ -217,108 +267,144 @@ while run == True:
         if cooldown_mapa == 0:
             if mapas.mapa_actual == 1 and jugador.forma.colliderect(salida):
                 mapas.mapa_actual = 2
-                jugador.forma.center = (constantes.ANCHO_VENTANA // 2, 120)
+                posicionar_jugador_entrada(mapas.salida_mapa2, "arriba", jugador)
                 cooldown_mapa = 30
                 cambio_mapa = True
             elif mapas.mapa_actual == 2:
                 if jugador.forma.colliderect(salida):
                     mapas.mapa_actual = 1
-                    jugador.forma.center = (constantes.ANCHO_VENTANA // 2, constantes.ALTO_VENTANA - 120)
+                    posicionar_jugador_entrada(mapas.salida_mapa1, "abajo", jugador)
                     cooldown_mapa = 30
+                    cambio_mapa = True
                 elif jugador.forma.colliderect(salida_abajo):
                     mapas.mapa_actual = 3
-                    jugador.forma.center = (constantes.ANCHO_VENTANA // 2, 120)
+                    posicionar_jugador_entrada(mapas.salida_mapa3, "arriba", jugador)
                     cooldown_mapa = 30
+                    cambio_mapa = True
             elif mapas.mapa_actual == 3:
                 if jugador.forma.colliderect(salida):
                     mapas.mapa_actual = 2
-                    jugador.forma.center = (constantes.ANCHO_VENTANA // 2, constantes.ALTO_VENTANA - 120)
+                    posicionar_jugador_entrada(mapas.salida_mapa2_abajo, "abajo", jugador)
                     cooldown_mapa = 30
                     cambio_mapa = True
                 elif jugador.forma.colliderect(salida_izquierda):
                     mapas.mapa_actual = 4
-                    jugador.forma.center = (
-                        mapas.salida_mapa4_derecha.left - jugador.forma.width // 2 - 10,
-                        mapas.salida_mapa4_derecha.centery
-                    )
+                    posicionar_jugador_entrada(mapas.salida_mapa4_derecha, "derecha", jugador)
                     cooldown_mapa = 30
                     cambio_mapa = True
                 elif jugador.forma.colliderect(mapas.salida_mapa3_derecha):
                     mapas.mapa_actual = 7
-                    jugador.forma.center = (120, constantes.ALTO_VENTANA // 2)
+                    posicionar_jugador_entrada(mapas.salida_mapa7, "izquierda", jugador)
                     cooldown_mapa = 30
                     cambio_mapa = True
                 elif jugador.forma.colliderect(salida_abajo):
                     mapas.mapa_actual = 8
-                    jugador.forma.center = (1140, 120)
+                    posicionar_jugador_entrada(mapas.salida_mapa8, "arriba", jugador)
                     cooldown_mapa = 30
+                    cambio_mapa = True
             elif mapas.mapa_actual == 4:
                 if jugador.forma.colliderect(salida):
                     mapas.mapa_actual = 3
-                    jugador.forma.center = (
-                        mapas.salida_mapa3_izquierda.right + jugador.forma.width // 2 + 10,
-                        mapas.salida_mapa3_izquierda.centery
-                    )
+                    posicionar_jugador_entrada(mapas.salida_mapa3_izquierda, "izquierda", jugador)
                     cooldown_mapa = 30
                     cambio_mapa = True
                 elif jugador.forma.colliderect(salida_izquierda):
                     mapas.mapa_actual = 5
-                    jugador.forma.center = (
-                        constantes.ANCHO_VENTANA - 120,
-                        constantes.ALTO_VENTANA // 2
-                    )
+                    posicionar_jugador_entrada(mapas.salida_mapa5, "derecha", jugador)
+                    cooldown_mapa = 30
+                    cambio_mapa = True
+                elif jugador.forma.colliderect(mapas.salida_mapa4_oficina):
+                    mapas.mapa_actual = 6
+                    posicionar_jugador_entrada(mapas.salida_oficina_profesores, "abajo", jugador)
                     cooldown_mapa = 30
                     cambio_mapa = True
             elif mapas.mapa_actual == 5 and jugador.forma.colliderect(salida):
                 mapas.mapa_actual = 4
-                jugador.forma.center = (
-                    mapas.salida_mapa4_izquierda.right + jugador.forma.width // 2 + 20,
-                    mapas.salida_mapa4_izquierda.centery
-                )
+                posicionar_jugador_entrada(mapas.salida_mapa4_izquierda, "izquierda", jugador)
+                cooldown_mapa = 30
+                cambio_mapa = True
+            elif mapas.mapa_actual == 6 and jugador.forma.colliderect(salida):
+                mapas.mapa_actual = 4
+                posicionar_jugador_entrada(mapas.salida_mapa4_oficina, "arriba", jugador)
                 cooldown_mapa = 30
                 cambio_mapa = True
             elif mapas.mapa_actual == 7 and jugador.forma.colliderect(salida):
                 mapas.mapa_actual = 3
-                jugador.forma.center = (constantes.ANCHO_VENTANA - 120, constantes.ALTO_VENTANA // 2)
+                posicionar_jugador_entrada(mapas.salida_mapa3_derecha, "derecha", jugador)
                 cooldown_mapa = 30
+                cambio_mapa = True
             elif mapas.mapa_actual == 7 and jugador.forma.colliderect(salida_abajo):
                 mapas.mapa_actual = 9
-                jugador.forma.center = (120, 120)
+                posicionar_jugador_entrada(mapas.salida_mapa9, "arriba", jugador)
                 cooldown_mapa = 30
+                cambio_mapa = True
             elif mapas.mapa_actual == 8 and jugador.forma.colliderect(salida):
                 mapas.mapa_actual = 3
-                jugador.forma.center = (1160, constantes.ALTO_VENTANA - 120)
+                posicionar_jugador_entrada(mapas.salida_mapa3_abajo, "abajo", jugador)
                 cooldown_mapa = 30
+                cambio_mapa = True
             elif mapas.mapa_actual == 9 and jugador.forma.colliderect(salida):
                 mapas.mapa_actual = 7
-                jugador.forma.center = (120, constantes.ALTO_VENTANA - 120)
+                posicionar_jugador_entrada(mapas.salida_mapa7, "izquierda", jugador)
                 cooldown_mapa = 30
+                cambio_mapa = True
             elif mapas.mapa_actual == 10 and jugador.forma.colliderect(salida):
                 mapas.mapa_actual = 3
-                jugador.forma.center = (
-                    constantes.ANCHO_VENTANA - 120,
-                    constantes.ALTO_VENTANA // 2
-                )
+                posicionar_jugador_entrada(mapas.salida_mapa3_derecha, "derecha", jugador)
                 cooldown_mapa = 30
                 cambio_mapa = True
 
         if cambio_mapa:
             mover_arriba = mover_abajo = mover_izquierda = mover_derecha = False
+            paredes, salida, salida_izquierda, salida_abajo = obtener_variables_mapa(mapas.mapa_actual)
+            paredes_con_bus = paredes.copy()
+            if mapas.mapa_actual == 1:
+                paredes_con_bus.append(bus.rect)
 
-        if mapas.mapa_actual == 4:
-            # Seguimiento de cámara: mantener al jugador centrado
+        if mapas.mapa_actual == 1:
+
+            # Cámara mapa 1
             camera_x = jugador.forma.centerx - constantes.ANCHO_VENTANA // 2
             camera_y = jugador.forma.centery - constantes.ALTO_VENTANA // 2
 
-            # Limitar la cámara a los bordes de la imagen
-            camera_x = max(MAPA4_OFFSET_X,
-                           min(camera_x, MAPA4_OFFSET_X + mapa4_w - constantes.ANCHO_VENTANA))
-            camera_y = max(MAPA4_OFFSET_Y,
-                           min(camera_y, MAPA4_OFFSET_Y + mapa4_h - constantes.ALTO_VENTANA))
+            camera_x = max(
+                MAPA1_OFFSET_X,
+                min(camera_x, MAPA1_OFFSET_X + mapa1_w - constantes.ANCHO_VENTANA)
+            )
 
-            # Dibujar fondo con offset de cámara
+            camera_y = max(
+                MAPA1_OFFSET_Y,
+                min(camera_y, MAPA1_OFFSET_Y + mapa1_h - constantes.ALTO_VENTANA)
+            )
+
             ventana.fill((0, 0, 0))
-            ventana.blit(mapa4_img, (MAPA4_OFFSET_X - camera_x, MAPA4_OFFSET_Y - camera_y))
+            ventana.blit(
+                mapa1_img,
+                (MAPA1_OFFSET_X - camera_x, MAPA1_OFFSET_Y - camera_y)
+            )
+
+        elif mapas.mapa_actual == 4:
+
+            # Cámara mapa 4
+            camera_x = jugador.forma.centerx - constantes.ANCHO_VENTANA // 2
+            camera_y = jugador.forma.centery - constantes.ALTO_VENTANA // 2
+
+            camera_x = max(
+                MAPA4_OFFSET_X,
+                min(camera_x, MAPA4_OFFSET_X + mapa4_w - constantes.ANCHO_VENTANA)
+            )
+
+            camera_y = max(
+                MAPA4_OFFSET_Y,
+                min(camera_y, MAPA4_OFFSET_Y + mapa4_h - constantes.ALTO_VENTANA)
+            )
+
+            ventana.fill((0, 0, 0))
+            ventana.blit(
+                mapa4_img,
+                (MAPA4_OFFSET_X - camera_x, MAPA4_OFFSET_Y - camera_y)
+            )
+
         else:
             camera_x = 0
             camera_y = 0
@@ -336,7 +422,7 @@ while run == True:
 
                # mostrar hitbox paredes
             if mostrar_hitbox:
-                if mapas.mapa_actual == 4:
+                if mapas.mapa_actual == 1 or mapas.mapa_actual == 4:
                     pygame.draw.rect(
                         ventana,
                         (255, 0, 0),
@@ -364,41 +450,8 @@ while run == True:
                 4
             )
     
-        # dibujar salida principal
-        if mapas.mapa_actual == 4:
-
-            pygame.draw.rect(
-                ventana,
-                (0, 0, 120),
-                pygame.Rect(
-                    salida.x - camera_x,
-                    salida.y - camera_y,
-                    salida.width,
-                    salida.height
-                )
-            )
-
-            pygame.draw.rect(
-                ventana,
-                (0, 0, 120),
-                pygame.Rect(
-                    salida_izquierda.x - camera_x,
-                    salida_izquierda.y - camera_y,
-                    salida_izquierda.width,
-                    salida_izquierda.height
-                )
-            )
-
-        else:
-
-            pygame.draw.rect(
-                ventana,
-                (0, 0, 120),
-                salida
-            )
-
         # dibujar jugador
-        if mapas.mapa_actual == 4:
+        if mapas.mapa_actual == 1 or mapas.mapa_actual == 4:
             ventana.blit(
                 jugador.image,
                 (
@@ -416,7 +469,7 @@ while run == True:
             )
         # hitbox jugador
         if mostrar_hitbox:
-            if mapas.mapa_actual == 4:
+            if mapas.mapa_actual == 1 or mapas.mapa_actual == 4:
                 pygame.draw.rect(
                     ventana,
                     (0, 255, 0),
@@ -435,6 +488,61 @@ while run == True:
                     jugador.forma,
                     4
                 )
+            
+            # Dibujar hitbox de salidas en modo debug
+            if mapas.mapa_actual == 4:
+                # Dibujar hitbox de salida derecha
+                pygame.draw.rect(
+                    ventana,
+                    (0, 0, 255),
+                    pygame.Rect(
+                        salida.x - camera_x,
+                        salida.y - camera_y,
+                        salida.width,
+                        salida.height
+                    ),
+                    3
+                )
+
+                # Dibujar hitbox de salida izquierda
+                pygame.draw.rect(
+                    ventana,
+                    (0, 0, 255),
+                    pygame.Rect(
+                        salida_izquierda.x - camera_x,
+                        salida_izquierda.y - camera_y,
+                        salida_izquierda.width,
+                        salida_izquierda.height
+                    ),
+                    3
+                )
+
+            else:
+                # Dibujar hitbox de salida principal para otros mapas
+                pygame.draw.rect(
+                    ventana,
+                    (0, 0, 255),
+                    salida,
+                    3
+                )
+                
+                # Dibujar salida_abajo si existe
+                if salida_abajo is not None:
+                    pygame.draw.rect(
+                        ventana,
+                        (0, 0, 255),
+                        salida_abajo,
+                        3
+                    )
+                
+                # Dibujar salida_izquierda si existe
+                if salida_izquierda is not None:
+                    pygame.draw.rect(
+                        ventana,
+                        (0, 0, 255),
+                        salida_izquierda,
+                        3
+                    )
 
     
     for event in pygame.event.get():

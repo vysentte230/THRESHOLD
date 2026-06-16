@@ -3,9 +3,56 @@ import constantes
 
 mapa_actual = 1
 
+#PARADERO
+mapa1_img = pygame.image.load(
+    "assets/images/Map/Paradero.png"
+)
+
+#DONDE ESTAN LAS LETRAS ULAGOS
+mapa2_img = pygame.image.load(
+    "assets/images/Map/Entrada_universidad.png"
+)
+
+#SI
+mapa3_img = pygame.image.load(
+    "assets/images/Map/Entrada_u2.png"
+)
+
+#este es el mapa4 ENTRADA EDIFICIO IZQUIERDO
 mapa_edificio = pygame.image.load(
     "assets/images/Map/Edificio1_1.png"
 )
+
+#ESTE ES EL PASILLO DEL EDIFICIO IZQUIERDO
+mapa5_img = pygame.image.load(
+    "assets/images/Map/Pasillo.png"
+)
+
+#LA OFICINA DE PROFESORES
+mapa6_img = pygame.image.load(
+    "assets/images/Map/Oficina_profesores.png"
+)
+
+#ENTRADA EDIFICIO DERECHA
+mapa7_img = pygame.image.load(
+    "assets/images/Map/Edificio2.png"
+)
+
+#AQUI IRA LA BIBLIOTECA pero aun no se termina
+#mapa8_img = pygame.image.load(
+#    "assets/images/Map/.png"
+#)
+
+#LAS ESCALERAS
+mapa9_img = pygame.image.load(
+    "assets/images/Map/Escaleras.png"
+)
+
+#Segundo piso
+mapa10_img = pygame.image.load(
+    "assets/images/Map/Segundo_piso.png"
+)
+
 
 # mapa 1: INICIO
 paredes_mapa1 = [
@@ -24,7 +71,8 @@ paredes_mapa2 = [
     pygame.Rect(0, 0, 700, 40),
     pygame.Rect(1200, 0, constantes.ANCHO_VENTANA - 1200, 40),
     pygame.Rect(0, 0, 40, constantes.ALTO_VENTANA),
-    pygame.Rect(constantes.ANCHO_VENTANA - 40, 0, 40, constantes.ALTO_VENTANA)
+    pygame.Rect(constantes.ANCHO_VENTANA - 40, 0, 40, constantes.ALTO_VENTANA),
+    pygame.Rect(800, 600, 300, 200), #logo ulagos
 ]
 
 # puerta superior a INICIO
@@ -58,12 +106,33 @@ salida_mapa3_abajo = pygame.Rect(0, constantes.ALTO_VENTANA - 40, constantes.ANC
 # pared izquierda dividida para dejar abierta la puerta izquierda
 # pared derecha dividida para dejar abierta la puerta derecha
 paredes_mapa4 = [
-    pygame.Rect(100, -40, 90, 360),    # pared izquierda superior
-    pygame.Rect(100, 780, 90, 876),    # pared izquierda inferior
-    pygame.Rect(3528, -40, 180, 480),  # pared derecha superior
-    pygame.Rect(3528, 700, 180, 860),  # pared derecha inferior
-    pygame.Rect(100, -40, 3702, 162),  # pared superior
-    pygame.Rect(100, 1676, 3702, 120)  # pared inferior
+    # pared diagonal
+    pygame.Rect(3180, 1500, 40, 40),
+    pygame.Rect(3220, 1430, 40, 40),
+    pygame.Rect(3270, 1360, 40, 40),
+    pygame.Rect(3310, 1290, 40, 40),
+    pygame.Rect(3360, 1220, 40, 40),
+    pygame.Rect(3390, 1150, 40, 40),
+    pygame.Rect(3430, 1080, 40, 40),
+    pygame.Rect(3470, 1010, 40, 40),
+    pygame.Rect(3510, 940, 40, 40),
+
+    pygame.Rect(200, 940, 1455, 1000), #pared aula magna
+    pygame.Rect(200, 750, 240, 240), #entrada izquuierda aula magna
+    pygame.Rect(1341, 750, 314, 300), #entrada derecha aula magna
+
+     pygame.Rect(1790, 960, 120, 220), #escritorio
+
+    pygame.Rect(100, -20, 74, 360),    # pared izquierda superior
+    pygame.Rect(100, 650, 74, 876),    # pared izquierda inferior
+    pygame.Rect(3478, -120, 180, 480),  # pared derecha superior
+    pygame.Rect(3478, 650, 180, 860),  # pared derecha inferior
+    pygame.Rect(100, -40, 2335, 162),  # pared superior
+     pygame.Rect(2600, -40, 2335, 162),  # pared superior
+
+    
+    pygame.Rect(100, 1540, 3702, 120)  # pared inferior
+    
 ]
 
 # salida izquierda de mapa 4 hacia nuevo mapa 5
@@ -86,6 +155,21 @@ paredes_mapa5 = [
 
 # salida derecha de retorno a mapa 4
 salida_mapa5 = pygame.Rect(constantes.ANCHO_VENTANA - 40, 420, 40, 260)
+
+
+# mapa 6: oficina de profesores (arriba de mapa 4)
+paredes_oficina_profesores = [
+    pygame.Rect(0, 0, constantes.ANCHO_VENTANA, 40),      # pared superior
+    pygame.Rect(0, 0, 40, constantes.ALTO_VENTANA),        # pared izquierda
+    pygame.Rect(constantes.ANCHO_VENTANA - 40, 0, 40, constantes.ALTO_VENTANA),  # pared derecha
+    pygame.Rect(0, constantes.ALTO_VENTANA - 40, constantes.ANCHO_VENTANA, 40)   # pared inferior
+]
+
+# puerta de entrada a oficina de profesores (parte superior derecha del mapa 4)
+salida_mapa4_oficina = pygame.Rect(3100, -40, 260, 40)
+
+# puerta de salida de oficina de profesores (parte inferior centrada)
+salida_oficina_profesores = pygame.Rect(constantes.ANCHO_VENTANA // 2 - 130, constantes.ALTO_VENTANA - 40, 260, 40)
 
 
 
