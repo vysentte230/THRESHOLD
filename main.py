@@ -28,6 +28,26 @@ pantalla = pygame.display.set_mode((constantes.ANCHO_PANTALLA, constantes.ALTO_P
 
 pygame.display.set_caption("Threshold")
 
+
+# Configuración mapa 1
+
+MAPA1_SCALE_X = 1.0
+MAPA1_SCALE_Y = 1.0
+
+MAPA1_OFFSET_X = 0
+MAPA1_OFFSET_Y = 0
+
+mapa1_img = pygame.transform.scale(
+    mapas.mapa1_img,
+    (
+        int(constantes.ANCHO_VENTANA * MAPA1_SCALE_X),
+        int(constantes.ALTO_VENTANA * MAPA1_SCALE_Y)
+    )
+)
+
+mapa1_w, mapa1_h = mapa1_img.get_size()
+
+
 # Configuración del mapa 4
 MAPA4_SCALE_X = 2.60
 MAPA4_SCALE_Y = 1.9
@@ -341,20 +361,50 @@ while run == True:
             if mapas.mapa_actual == 1:
                 paredes_con_bus.append(bus.rect)
 
-        if mapas.mapa_actual == 4:
-            # Seguimiento de cámara: mantener al jugador centrado
+        if mapas.mapa_actual == 1:
+
+            # Cámara mapa 1
             camera_x = jugador.forma.centerx - constantes.ANCHO_VENTANA // 2
             camera_y = jugador.forma.centery - constantes.ALTO_VENTANA // 2
 
-            # Limitar la cámara a los bordes de la imagen
-            camera_x = max(MAPA4_OFFSET_X,
-                           min(camera_x, MAPA4_OFFSET_X + mapa4_w - constantes.ANCHO_VENTANA))
-            camera_y = max(MAPA4_OFFSET_Y,
-                           min(camera_y, MAPA4_OFFSET_Y + mapa4_h - constantes.ALTO_VENTANA))
+            camera_x = max(
+                MAPA1_OFFSET_X,
+                min(camera_x, MAPA1_OFFSET_X + mapa1_w - constantes.ANCHO_VENTANA)
+            )
 
-            # Dibujar fondo con offset de cámara
+            camera_y = max(
+                MAPA1_OFFSET_Y,
+                min(camera_y, MAPA1_OFFSET_Y + mapa1_h - constantes.ALTO_VENTANA)
+            )
+
             ventana.fill((0, 0, 0))
-            ventana.blit(mapa4_img, (MAPA4_OFFSET_X - camera_x, MAPA4_OFFSET_Y - camera_y))
+            ventana.blit(
+                mapa1_img,
+                (MAPA1_OFFSET_X - camera_x, MAPA1_OFFSET_Y - camera_y)
+            )
+
+        elif mapas.mapa_actual == 4:
+
+            # Cámara mapa 4
+            camera_x = jugador.forma.centerx - constantes.ANCHO_VENTANA // 2
+            camera_y = jugador.forma.centery - constantes.ALTO_VENTANA // 2
+
+            camera_x = max(
+                MAPA4_OFFSET_X,
+                min(camera_x, MAPA4_OFFSET_X + mapa4_w - constantes.ANCHO_VENTANA)
+            )
+
+            camera_y = max(
+                MAPA4_OFFSET_Y,
+                min(camera_y, MAPA4_OFFSET_Y + mapa4_h - constantes.ALTO_VENTANA)
+            )
+
+            ventana.fill((0, 0, 0))
+            ventana.blit(
+                mapa4_img,
+                (MAPA4_OFFSET_X - camera_x, MAPA4_OFFSET_Y - camera_y)
+            )
+
         else:
             camera_x = 0
             camera_y = 0
@@ -372,7 +422,7 @@ while run == True:
 
                # mostrar hitbox paredes
             if mostrar_hitbox:
-                if mapas.mapa_actual == 4:
+                if mapas.mapa_actual == 1 or mapas.mapa_actual == 4:
                     pygame.draw.rect(
                         ventana,
                         (255, 0, 0),
@@ -401,7 +451,7 @@ while run == True:
             )
     
         # dibujar jugador
-        if mapas.mapa_actual == 4:
+        if mapas.mapa_actual == 1 or mapas.mapa_actual == 4:
             ventana.blit(
                 jugador.image,
                 (
@@ -419,7 +469,7 @@ while run == True:
             )
         # hitbox jugador
         if mostrar_hitbox:
-            if mapas.mapa_actual == 4:
+            if mapas.mapa_actual == 1 or mapas.mapa_actual == 4:
                 pygame.draw.rect(
                     ventana,
                     (0, 255, 0),

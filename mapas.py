@@ -3,9 +3,56 @@ import constantes
 
 mapa_actual = 1
 
+#PARADERO
+mapa1_img = pygame.image.load(
+    "assets/images/Map/Paradero.png"
+)
+
+#DONDE ESTAN LAS LETRAS ULAGOS
+mapa2_img = pygame.image.load(
+    "assets/images/Map/Entrada_universidad.png"
+)
+
+#SI
+mapa3_img = pygame.image.load(
+    "assets/images/Map/Entrada_u2.png"
+)
+
+#este es el mapa4 ENTRADA EDIFICIO IZQUIERDO
 mapa_edificio = pygame.image.load(
     "assets/images/Map/Edificio1_1.png"
 )
+
+#ESTE ES EL PASILLO DEL EDIFICIO IZQUIERDO
+mapa5_img = pygame.image.load(
+    "assets/images/Map/Pasillo.png"
+)
+
+#LA OFICINA DE PROFESORES
+mapa6_img = pygame.image.load(
+    "assets/images/Map/Oficina_profesores.png"
+)
+
+#ENTRADA EDIFICIO DERECHA
+mapa7_img = pygame.image.load(
+    "assets/images/Map/Edificio2.png"
+)
+
+#AQUI IRA LA BIBLIOTECA pero aun no se termina
+#mapa8_img = pygame.image.load(
+#    "assets/images/Map/.png"
+#)
+
+#LAS ESCALERAS
+mapa9_img = pygame.image.load(
+    "assets/images/Map/Escaleras.png"
+)
+
+#Segundo piso
+mapa10_img = pygame.image.load(
+    "assets/images/Map/Segundo_piso.png"
+)
+
 
 # mapa 1: INICIO
 paredes_mapa1 = [
