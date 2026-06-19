@@ -13,8 +13,8 @@ pygame.mixer.init()
 
 
 #aqui hace spawn
-jugador = Personaje(constantes.ANCHO_VENTANA // 2, 200)
-bus = Bus(1800, -300)
+jugador = Personaje(1450, 550)
+bus = Bus(1500, -300)
 
 fondo_menu = pygame.image.load("assets//images/Menu//Menu.png")
 pygame.mixer.music.load("assets//music//musica//EmptyTown_DELTARUNE.mp3")
@@ -33,7 +33,6 @@ pygame.display.set_caption("Threshold")
 
 MAPA1_SCALE_X = 1.0
 MAPA1_SCALE_Y = 1.0
-
 MAPA1_OFFSET_X = 0
 MAPA1_OFFSET_Y = 0
 
@@ -61,6 +60,21 @@ mapa4_img = pygame.transform.scale(
     )
 )
 mapa4_w, mapa4_h = mapa4_img.get_size()
+# Configuración mapa 6 (doble de pantalla para cámara libre)
+MAPA6_SCALE_X = 2.0
+MAPA6_SCALE_Y = 2.0
+MAPA6_OFFSET_X = 0
+MAPA6_OFFSET_Y = 0
+
+mapa6_img = pygame.transform.scale(
+    mapas.mapa6_img,
+    (
+        int(constantes.ANCHO_VENTANA * MAPA6_SCALE_X),
+        int(constantes.ALTO_VENTANA * MAPA6_SCALE_Y)
+    )
+)
+
+mapa6_w, mapa6_h = mapa6_img.get_size()
 
 estado_juego = "menu"
 
@@ -74,8 +88,8 @@ mover_derecha = False
 reloj = pygame.time.Clock()
 
 #fuentes para crear letras :p
-fuente_titulo = pygame.font.SysFont("assets/fonts/PressStart2p.ttf",120)
-fuente_boton = pygame.font.SysFont("assets/fonts/PressStart2p.ttf",50)
+fuente_titulo = pygame.font.Font("assets/fonts/PressStart2p.ttf", 120)
+fuente_boton = pygame.font.Font("assets/fonts/PressStart2p.ttf", 50)
 
 def render_pixelado(fuente, texto, color, factor=3):
     superficie = fuente.render(texto, False, color)
@@ -182,11 +196,11 @@ while run == True:
          (160,92,152), (176,76,120), (194,60,88), (210,44,60), (232,32,44)
      ]
      texto = "THRESHOLD"
-     x_inicial = constantes.ANCHO_VENTANA // 2 - 320
+     x_inicial = constantes.ANCHO_VENTANA // 2 - 495
      tiempo = pygame.time.get_ticks()
      pulso = int(30 + ((math.sin(tiempo / 300) + 1) / 2) * 100)
      for i, letra in enumerate(texto):
-         dibujar_texto_glow(ventana, letra, fuente_titulo, colores_titulo[i], (x_inicial + i * 70, 180), alpha_glow=pulso)
+         dibujar_texto_glow(ventana, letra, fuente_titulo, colores_titulo[i], (x_inicial + i * 120, 180), alpha_glow=pulso)
 
      mouse_real = pygame.mouse.get_pos()
      mouse_pos = (
@@ -230,19 +244,20 @@ while run == True:
 
         velocidad_actual = constantes.VELOCIDAD
 
+        teclas = pygame.key.get_pressed()
         delta_x = 0
         delta_y = 0
 
-        if mover_arriba:
+        if teclas[pygame.K_w] or teclas[pygame.K_UP]:
             delta_y = -velocidad_actual
 
-        if mover_abajo:
+        if teclas[pygame.K_s] or teclas[pygame.K_DOWN]:
             delta_y = velocidad_actual
 
-        if mover_izquierda:
+        if teclas[pygame.K_a] or teclas[pygame.K_LEFT]:
             delta_x = -velocidad_actual
 
-        if mover_derecha:
+        if teclas[pygame.K_d] or teclas[pygame.K_RIGHT]:
             delta_x = velocidad_actual
 
         salida_abajo = None
@@ -256,11 +271,7 @@ while run == True:
             if jugador.forma.colliderect(bus.rect):
                 velocidad_actual = 2
 
-        paredes_con_bus = paredes.copy()
-        if mapas.mapa_actual == 1:
-            paredes_con_bus.append(bus.rect)
-
-        jugador.movimiento(delta_x, delta_y, paredes_con_bus)
+        jugador.movimiento(delta_x, delta_y, paredes)
 
         # cambiar mapa
         cambio_mapa = False
@@ -313,11 +324,16 @@ while run == True:
                     posicionar_jugador_entrada(mapas.salida_mapa5, "derecha", jugador)
                     cooldown_mapa = 30
                     cambio_mapa = True
-                elif jugador.forma.colliderect(mapas.salida_mapa4_oficina):
+                elif jugador.forma.colliderect(mapas.salida_mapa4_arriba):
                     mapas.mapa_actual = 6
-                    posicionar_jugador_entrada(mapas.salida_oficina_profesores, "abajo", jugador)
+                    posicionar_jugador_entrada(
+                        mapas.salida_oficina_profesores,
+                        "arriba",
+                        jugador
+                    )
                     cooldown_mapa = 30
                     cambio_mapa = True
+                
             elif mapas.mapa_actual == 5 and jugador.forma.colliderect(salida):
                 mapas.mapa_actual = 4
                 posicionar_jugador_entrada(mapas.salida_mapa4_izquierda, "izquierda", jugador)
@@ -325,7 +341,7 @@ while run == True:
                 cambio_mapa = True
             elif mapas.mapa_actual == 6 and jugador.forma.colliderect(salida):
                 mapas.mapa_actual = 4
-                posicionar_jugador_entrada(mapas.salida_mapa4_oficina, "arriba", jugador)
+                posicionar_jugador_entrada(mapas.salida_mapa4_arriba, "abajo", jugador)
                 cooldown_mapa = 30
                 cambio_mapa = True
             elif mapas.mapa_actual == 7 and jugador.forma.colliderect(salida):
@@ -405,6 +421,25 @@ while run == True:
                 (MAPA4_OFFSET_X - camera_x, MAPA4_OFFSET_Y - camera_y)
             )
 
+        elif mapas.mapa_actual == 6:
+            camera_x = jugador.forma.centerx - constantes.ANCHO_VENTANA // 2
+            camera_y = jugador.forma.centery - constantes.ALTO_VENTANA // 2
+
+            camera_x = max(
+                MAPA6_OFFSET_X,
+                min(camera_x, MAPA6_OFFSET_X + mapa6_w - constantes.ANCHO_VENTANA)
+            )
+            camera_y = max(
+                MAPA6_OFFSET_Y,
+                min(camera_y, MAPA6_OFFSET_Y + mapa6_h - constantes.ALTO_VENTANA)
+            )
+
+            ventana.fill((0, 0, 0))
+            ventana.blit(
+                mapa6_img,
+                (MAPA6_OFFSET_X - camera_x, MAPA6_OFFSET_Y - camera_y)
+            )
+
         else:
             camera_x = 0
             camera_y = 0
@@ -412,17 +447,17 @@ while run == True:
         # dibujar paredes mas colisiones
         for pared in paredes:
 
-            # No dibujar paredes grises en el edificio ni en mapa 4
-            if mapas.mapa_actual != 10 and mapas.mapa_actual != 4:
-                pygame.draw.rect(
-                    ventana,
-                    (150, 150, 150),
-                    pared
-                )
+            # No dibujar paredes grises en el edificio, mapa 1 ni mapa 4
+          if mapas.mapa_actual != 10 and mapas.mapa_actual != 4 and mapas.mapa_actual != 1 and mapas.mapa_actual != 6:
+           pygame.draw.rect(
+            ventana,
+            (150, 150, 150),
+            pared
+        )
 
                # mostrar hitbox paredes
-            if mostrar_hitbox:
-                if mapas.mapa_actual == 1 or mapas.mapa_actual == 4:
+           if mostrar_hitbox:
+                if mapas.mapa_actual == 1 or mapas.mapa_actual == 4 or mapas.mapa_actual == 6:
                     pygame.draw.rect(
                         ventana,
                         (255, 0, 0),

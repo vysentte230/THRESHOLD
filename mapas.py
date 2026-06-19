@@ -53,14 +53,25 @@ mapa10_img = pygame.image.load(
     "assets/images/Map/Segundo_piso.png"
 )
 
-
-# mapa 1: INICIO
+#Mapa del patio central
 paredes_mapa1 = [
     pygame.Rect(0, 0, constantes.ANCHO_VENTANA, 40),
     pygame.Rect(0, 0, 40, constantes.ALTO_VENTANA),
     pygame.Rect(constantes.ANCHO_VENTANA - 40, 0, 40, constantes.ALTO_VENTANA),
     pygame.Rect(0, constantes.ALTO_VENTANA - 40, 700, 40),
-    pygame.Rect(1200, constantes.ALTO_VENTANA - 40, 720, 40)
+    pygame.Rect(1200, constantes.ALTO_VENTANA - 40, 720, 40),
+
+    # arboleda de flores amarillas (zona oscura izquierda) - límite total
+    pygame.Rect(0, 0, 1040, 1080),
+
+    # paradero (caseta azul)
+    pygame.Rect(1165, 40, 290, 330),
+
+    # carretera (franja gris diagonal) - bloqueada por tramos
+    pygame.Rect(1430, 0, 490, 200),
+    pygame.Rect(1550, 200, 370, 250),
+    pygame.Rect(1650, 450, 270, 300),
+    pygame.Rect(1750, 750, 170, 330),
 ]
 
 # salida del mapa 1 hacia el patio central
@@ -127,8 +138,8 @@ paredes_mapa4 = [
     pygame.Rect(100, 650, 74, 876),    # pared izquierda inferior
     pygame.Rect(3478, -120, 180, 480),  # pared derecha superior
     pygame.Rect(3478, 650, 180, 860),  # pared derecha inferior
-    pygame.Rect(100, -40, 2335, 162),  # pared superior
-     pygame.Rect(2600, -40, 2335, 162),  # pared superior
+    pygame.Rect(100, 122, 1855, 40),   # pared superior (izquierda de la puerta)
+    pygame.Rect(2280, 122, 2655, 40),  # pared superior (derecha de la puerta)
 
     
     pygame.Rect(100, 1540, 3702, 120)  # pared inferior
@@ -140,6 +151,9 @@ salida_mapa4_izquierda = pygame.Rect(100, 340, 40, 440)
 
 # salida derecha de retorno a mapa 3
 salida_mapa4_derecha = pygame.Rect(3528, 440, 40, 260)
+
+# salida superior de mapa 4 hacia la oficina de profesores (mapa 6)
+salida_mapa4_arriba = pygame.Rect(1955, 80, 324, 80)
 
 # mapa 5: nueva zona a la izquierda de mapa 4
 paredes_mapa5 = [
@@ -157,20 +171,49 @@ paredes_mapa5 = [
 salida_mapa5 = pygame.Rect(constantes.ANCHO_VENTANA - 40, 420, 40, 260)
 
 
-# mapa 6: oficina de profesores (arriba de mapa 4)
+# mapa 6: oficina de profesores (mapa con cámara libre, tamaño 3840x2160)
+MAPA6_ANCHO = 3840
+MAPA6_ALTO = 2160
+
 paredes_oficina_profesores = [
-    pygame.Rect(0, 0, constantes.ANCHO_VENTANA, 40),      # pared superior
-    pygame.Rect(0, 0, 40, constantes.ALTO_VENTANA),        # pared izquierda
-    pygame.Rect(constantes.ANCHO_VENTANA - 40, 0, 40, constantes.ALTO_VENTANA),  # pared derecha
-    pygame.Rect(0, constantes.ALTO_VENTANA - 40, constantes.ANCHO_VENTANA, 40)   # pared inferior
+    # bordes externos
+    pygame.Rect(0, 0, MAPA6_ANCHO, 30),                      # pared superior
+    pygame.Rect(0, 0, 30, MAPA6_ALTO),                       # pared izquierda
+    pygame.Rect(MAPA6_ANCHO - 30, 0, 30, MAPA6_ALTO),        # pared derecha
+    pygame.Rect(0, MAPA6_ALTO - 30, 1700, 30),                    # pared inferior izquierda
+    pygame.Rect(2140, MAPA6_ALTO - 30, MAPA6_ANCHO - 2140, 30),   # pared inferior derecha
+
+    # columna central en T que separa los dos cubículos
+    pygame.Rect(1794, 824, 249, 1270),
+
+    # borde inferior del pasillo (deja hueco donde está la columna central)
+    pygame.Rect(0, 824, 1794, 26),
+    pygame.Rect(2043, 824, 1797, 26),
+
+    # muebles del pasillo superior
+    pygame.Rect(986, 420, 129, 226),    # extintor rojo
+    pygame.Rect(2230, 679, 420, 162),   # mesa con impresora
+    pygame.Rect(2780, 420, 113, 291),   # dispensador de agua
+    pygame.Rect(2958, 420, 162, 291),   # archivero negro
+
+    # muebles cubículo izquierdo
+    pygame.Rect(1164, 937, 226, 162),   # cajonera/mueble arriba
+    pygame.Rect(1455, 1600, 323, 291),  # escritorio con silla
+
+    # muebles cubículo derecho
+    pygame.Rect(2036, 1600, 323, 291),  # escritorio con silla
 ]
 
-# puerta de entrada a oficina de profesores (parte superior derecha del mapa 4)
-salida_mapa4_oficina = pygame.Rect(3100, -40, 260, 40)
+# puerta de entrada a oficina de profesores (parte superior del mapa 4)
+salida_mapa4_oficina = pygame.Rect(
+    2450,  # X
+    0,     # Y
+    180,   # ancho
+    40     # alto
+)
 
-# puerta de salida de oficina de profesores (parte inferior centrada)
-salida_oficina_profesores = pygame.Rect(constantes.ANCHO_VENTANA // 2 - 130, constantes.ALTO_VENTANA - 40, 260, 40)
-
+# salida inferior de oficina de profesores (entre los dos cubículos)
+salida_oficina_profesores = pygame.Rect(1700, MAPA6_ALTO - 60, 440, 60)
 
 
 # mapa 7: nueva zona a la derecha de mapa 3

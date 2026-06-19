@@ -75,9 +75,11 @@ class Personaje():
 
                 if delta_x > 0:
                     self.forma.right = pared.left
+                    delta_x = 0
 
                 if delta_x < 0:
                     self.forma.left = pared.right
+                    delta_x = 0
 
         # movimiento vertical
         self.forma.y += delta_y
@@ -87,9 +89,11 @@ class Personaje():
 
                 if delta_y > 0:
                     self.forma.bottom = pared.top
+                    delta_y = 0
 
                 if delta_y < 0:
                     self.forma.top = pared.bottom
+                    delta_y = 0
 
         moviendo = False
 
