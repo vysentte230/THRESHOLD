@@ -33,23 +33,14 @@ mapa6_img = pygame.image.load(
     "assets/images/Map/Oficina_profesores.png"
 )
 
-#ENTRADA EDIFICIO DERECHA
+#ENTRADA EDIFICIO DERECHA Mapa 7: Edificio2 (Pasillo, Biblioteca, Escaleras al segundo piso)
 mapa7_img = pygame.image.load(
     "assets/images/Map/Edificio2.png"
 )
 
-#AQUI IRA LA BIBLIOTECA pero aun no se termina
-#mapa8_img = pygame.image.load(
-#    "assets/images/Map/.png"
-#)
-
-#LAS ESCALERAS
-mapa9_img = pygame.image.load(
-    "assets/images/Map/Escaleras.png"
-)
 
 #Segundo piso
-mapa10_img = pygame.image.load(
+mapa8_img = pygame.image.load(
     "assets/images/Map/Segundo_piso.png"
 )
 
@@ -62,16 +53,12 @@ paredes_mapa1 = [
     pygame.Rect(1200, constantes.ALTO_VENTANA - 40, 720, 40),
 
     # arboleda de flores amarillas (zona oscura izquierda) - límite total
-    pygame.Rect(0, 0, 1040, 1080),
+    pygame.Rect(0, 0, 900, 800),
 
     # paradero (caseta azul)
     pygame.Rect(1165, 40, 290, 330),
 
-    # carretera (franja gris diagonal) - bloqueada por tramos
-    pygame.Rect(1430, 0, 490, 200),
-    pygame.Rect(1550, 200, 370, 250),
-    pygame.Rect(1650, 450, 270, 300),
-    pygame.Rect(1750, 750, 170, 330),
+   
 ]
 
 # salida del mapa 1 hacia el patio central
@@ -138,8 +125,8 @@ paredes_mapa4 = [
     pygame.Rect(100, 650, 74, 876),    # pared izquierda inferior
     pygame.Rect(3478, -120, 180, 480),  # pared derecha superior
     pygame.Rect(3478, 650, 180, 860),  # pared derecha inferior
-    pygame.Rect(100, 122, 1855, 40),   # pared superior (izquierda de la puerta)
-    pygame.Rect(2280, 122, 2655, 40),  # pared superior (derecha de la puerta)
+    pygame.Rect(100, 122, 2200, 40),   # pared superior (izquierda de la puerta)
+    pygame.Rect(2600, 122, 2335, 40),  # pared superior (derecha de la puerta)
 
     
     pygame.Rect(100, 1540, 3702, 120)  # pared inferior
@@ -153,7 +140,7 @@ salida_mapa4_izquierda = pygame.Rect(100, 340, 40, 440)
 salida_mapa4_derecha = pygame.Rect(3528, 440, 40, 260)
 
 # salida superior de mapa 4 hacia la oficina de profesores (mapa 6)
-salida_mapa4_arriba = pygame.Rect(1955, 80, 324, 80)
+salida_mapa4_arriba = pygame.Rect(2200, 80, 400, 80)
 
 # mapa 5: nueva zona a la izquierda de mapa 4
 paredes_mapa5 = [
@@ -183,12 +170,17 @@ paredes_oficina_profesores = [
     pygame.Rect(0, MAPA6_ALTO - 30, 1700, 30),                    # pared inferior izquierda
     pygame.Rect(2140, MAPA6_ALTO - 30, MAPA6_ANCHO - 2140, 30),   # pared inferior derecha
 
-    # columna central en T que separa los dos cubículos
-    pygame.Rect(1794, 824, 249, 1270),
-
-    # borde inferior del pasillo (deja hueco donde está la columna central)
-    pygame.Rect(0, 824, 1794, 26),
-    pygame.Rect(2043, 824, 1797, 26),
+    # paredes internas / muros del edificio según borde rojo visible
+    pygame.Rect(989, 400, 203, 250),    # pared división izquierda superior
+    pygame.Rect(1056, 470, 67, 60),     # muro pequeño sección central
+    pygame.Rect(1221, 490, 87, 100),    # muro junto a puerta izquierda
+    pygame.Rect(2240, 700, 300, 110),   # pared central superior
+    pygame.Rect(3287, 510, 9, 90),      # muro vertical derecha media
+    pygame.Rect(3355, 660, 126, 70),    # muro derecho sección baja
+    pygame.Rect(3423, 710, 67, 30),     # muro derecho inferior
+    pygame.Rect(3461, 420, 9, 80),      # muro derecho arriba
+    pygame.Rect(3461, 510, 9, 90),      # muro derecho externo
+    pygame.Rect(1231, 1020, 96, 20),    # muro frontal bajo
 
     # muebles del pasillo superior
     pygame.Rect(986, 420, 129, 226),    # extintor rojo
@@ -219,21 +211,22 @@ salida_oficina_profesores = pygame.Rect(1700, MAPA6_ALTO - 60, 440, 60)
 # mapa 7: nueva zona a la derecha de mapa 3
 zona_colision_mapa7_superior = pygame.Rect(40, 40, constantes.ANCHO_VENTANA - 80, 240)
 zona_colision_mapa7 = pygame.Rect(40, 680, 1360, 360)
+
+# Mapa 7 - Hitboxes (rojo = paredes)
 paredes_mapa7 = [
-    pygame.Rect(0, 0, 40, 420),
-    pygame.Rect(0, 680, 40, constantes.ALTO_VENTANA - 680),
-    pygame.Rect(constantes.ANCHO_VENTANA - 40, 0, 40, constantes.ALTO_VENTANA - 40),
-    pygame.Rect(0, 0, constantes.ANCHO_VENTANA, 40),
-    pygame.Rect(40, constantes.ALTO_VENTANA - 40, 2610, 40),
-    zona_colision_mapa7,
-    zona_colision_mapa7_superior
+    pygame.Rect(0, 0, 3840, 60),      # pared arriba
+    pygame.Rect(0, 0, 60, 2160),      # pared izquierda 
+
+    # Paredes principales visibles
+    pygame.Rect(0, 60, 1500, 220),    # pared horizontal superior
+    pygame.Rect(0, 700, 680, 220),    # pared posicion inferior izquierda
+    pygame.Rect(0, 1200, 1500, 220),
+    pygame.Rect(1000, 1200, 1500, 220),
 ]
 
-# salida izquierda de retorno a mapa 3
-salida_mapa7 = pygame.Rect(0, 420, 40, 260)
-
-# salida inferior hacia el nuevo mapa
-salida_mapa7_abajo = pygame.Rect(1440, constantes.ALTO_VENTANA - 40, 480, 40)
+# Salidas (azul) - ajusta según necesites
+salida_mapa7 = pygame.Rect(50, 420, 40, 260)           # salida izquierda (volver a mapa 3)
+salida_mapa7_abajo = pygame.Rect(1440, 2110, 480, 40)  # salida inferior (hacia mapa 8 segundo piso)
 
 # nuevo mapa 9: zona debajo de mapa 7
 paredes_mapa9 = [

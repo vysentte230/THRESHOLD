@@ -11,14 +11,23 @@ from bus import Bus
 pygame.init()
 pygame.mixer.init()
 
+MUSICA_MENU = "assets//music//musica//Titulo_chill.mp3"
+MUSICA_JUEGO = "assets//music//musica//Primer_dia.mp3"
+MUSICA_MAPA6 = "assets//music//musica//Brilliant Red.mp3"
+musica_actual = MUSICA_MENU
+musica_anterior = None
+
+def reproducir_musica(ruta, loop=-1):
+    pygame.mixer.music.load(ruta)
+    pygame.mixer.music.play(loop)
+
 
 #aqui hace spawn
 jugador = Personaje(1450, 550)
 bus = Bus(1500, -300)
 
 fondo_menu = pygame.image.load("assets//images/Menu//Menu.png")
-pygame.mixer.music.load("assets//music//musica//EmptyTown_DELTARUNE.mp3")
-pygame.mixer.music.play(-1) 
+reproducir_musica(MUSICA_MENU)
 
 
 fondo_menu = pygame.transform.scale(fondo_menu,( constantes.ANCHO_VENTANA,constantes.ALTO_VENTANA))
@@ -75,6 +84,19 @@ mapa6_img = pygame.transform.scale(
 )
 
 mapa6_w, mapa6_h = mapa6_img.get_size()
+
+# Configuración mapa 7 (cámara libre)
+MAPA7_SCALE_X = 1.7
+MAPA7_SCALE_Y = 1.7
+MAPA7_OFFSET_X = 0
+MAPA7_OFFSET_Y = 0
+
+mapa7_img = pygame.transform.scale(
+    mapas.mapa7_img,
+    (int(constantes.ANCHO_VENTANA * MAPA7_SCALE_X),
+     int(constantes.ALTO_VENTANA * MAPA7_SCALE_Y))
+)
+mapa7_w, mapa7_h = mapa7_img.get_size()
 
 estado_juego = "menu"
 
@@ -163,10 +185,10 @@ def obtener_variables_mapa(mapa):
 def posicionar_jugador_entrada(salida_rect, lado, jugador):
     if lado == "arriba":
         jugador.forma.centerx = salida_rect.centerx
-        jugador.forma.centery = salida_rect.bottom + jugador.forma.height // 2 + 30
+        jugador.forma.centery = salida_rect.bottom + jugador.forma.height // 2 + 120
     elif lado == "abajo":
         jugador.forma.centerx = salida_rect.centerx
-        jugador.forma.centery = salida_rect.top - jugador.forma.height // 2 - 30
+        jugador.forma.centery = salida_rect.top - jugador.forma.height // 2 - 120
     elif lado == "izquierda":
         jugador.forma.centerx = salida_rect.right + jugador.forma.width // 2 + 30
         jugador.forma.centery = salida_rect.centery
@@ -272,6 +294,10 @@ while run == True:
                 velocidad_actual = 2
 
         jugador.movimiento(delta_x, delta_y, paredes)
+        print("Jugador Y:", jugador.forma.top, "- Salida arriba:", mapas.salida_mapa4_arriba)
+        for pared in paredes:
+            if jugador.forma.colliderect(pared):
+             print("CHOCANDO CON:", pared)
 
         # cambiar mapa
         cambio_mapa = False
@@ -328,9 +354,13 @@ while run == True:
                     mapas.mapa_actual = 6
                     posicionar_jugador_entrada(
                         mapas.salida_oficina_profesores,
-                        "arriba",
+                        "abajo",
                         jugador
                     )
+                    if musica_actual != MUSICA_MAPA6:
+                        musica_anterior = musica_actual
+                        reproducir_musica(MUSICA_MAPA6)
+                        musica_actual = MUSICA_MAPA6
                     cooldown_mapa = 30
                     cambio_mapa = True
                 
@@ -341,7 +371,11 @@ while run == True:
                 cambio_mapa = True
             elif mapas.mapa_actual == 6 and jugador.forma.colliderect(salida):
                 mapas.mapa_actual = 4
-                posicionar_jugador_entrada(mapas.salida_mapa4_arriba, "abajo", jugador)
+                posicionar_jugador_entrada(mapas.salida_mapa4_arriba, "arriba", jugador)
+                if musica_actual == MUSICA_MAPA6:
+                    reproducir_musica(musica_anterior or MUSICA_JUEGO)
+                    musica_actual = musica_anterior or MUSICA_JUEGO
+                    musica_anterior = None
                 cooldown_mapa = 30
                 cambio_mapa = True
             elif mapas.mapa_actual == 7 and jugador.forma.colliderect(salida):
@@ -371,12 +405,56 @@ while run == True:
                 cambio_mapa = True
 
         if cambio_mapa:
+            # === FADE OUT (oscurecer suave) ===
+            for alpha in range(0, 256, 12):
+                ventana.fill((0, 0, 0))
+                overlay = pygame.Surface((constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA))
+                overlay.set_alpha(alpha)
+                ventana.blit(overlay, (0, 0))
+                
+                escalado = pygame.transform.scale(ventana, (constantes.ANCHO_PANTALLA, constantes.ALTO_PANTALLA))
+                pantalla.blit(escalado, (0, 0))
+                pygame.display.update()
+                pygame.time.wait(30)
+            
+            # === CAMBIO DE MAPA ===
             mover_arriba = mover_abajo = mover_izquierda = mover_derecha = False
             paredes, salida, salida_izquierda, salida_abajo = obtener_variables_mapa(mapas.mapa_actual)
-            paredes_con_bus = paredes.copy()
-            if mapas.mapa_actual == 1:
-                paredes_con_bus.append(bus.rect)
-
+            pygame.time.wait(30)
+            
+            # === FADE IN (desvanecimiento inverso suave) ===
+            for alpha in range(255, -1, -12):
+                # Dibujar nuevo mapa
+                if mapas.mapa_actual == 1:
+                    camera_x = max(MAPA1_OFFSET_X, min(jugador.forma.centerx - constantes.ANCHO_VENTANA // 2, MAPA1_OFFSET_X + mapa1_w - constantes.ANCHO_VENTANA))
+                    camera_y = max(MAPA1_OFFSET_Y, min(jugador.forma.centery - constantes.ALTO_VENTANA // 2, MAPA1_OFFSET_Y + mapa1_h - constantes.ALTO_VENTANA))
+                    ventana.blit(mapa1_img, (MAPA1_OFFSET_X - camera_x, MAPA1_OFFSET_Y - camera_y))
+                elif mapas.mapa_actual == 4:
+                    camera_x = max(MAPA4_OFFSET_X, min(jugador.forma.centerx - constantes.ANCHO_VENTANA // 2, MAPA4_OFFSET_X + mapa4_w - constantes.ANCHO_VENTANA))
+                    camera_y = max(MAPA4_OFFSET_Y, min(jugador.forma.centery - constantes.ALTO_VENTANA // 2, MAPA4_OFFSET_Y + mapa4_h - constantes.ALTO_VENTANA))
+                    ventana.blit(mapa4_img, (MAPA4_OFFSET_X - camera_x, MAPA4_OFFSET_Y - camera_y))
+                elif mapas.mapa_actual == 6:
+                    camera_x = max(MAPA6_OFFSET_X, min(jugador.forma.centerx - constantes.ANCHO_VENTANA // 2, MAPA6_OFFSET_X + mapa6_w - constantes.ANCHO_VENTANA))
+                    camera_y = max(MAPA6_OFFSET_Y, min(jugador.forma.centery - constantes.ALTO_VENTANA // 2, MAPA6_OFFSET_Y + mapa6_h - constantes.ALTO_VENTANA))
+                    ventana.blit(mapa6_img, (MAPA6_OFFSET_X - camera_x, MAPA6_OFFSET_Y - camera_y))
+                elif mapas.mapa_actual == 7:
+                    camera_x = max(MAPA7_OFFSET_X, min(jugador.forma.centerx - constantes.ANCHO_VENTANA // 2, MAPA7_OFFSET_X + mapa7_w - constantes.ANCHO_VENTANA))
+                    camera_y = max(MAPA7_OFFSET_Y, min(jugador.forma.centery - constantes.ALTO_VENTANA // 2, MAPA7_OFFSET_Y + mapa7_h - constantes.ALTO_VENTANA))
+                    ventana.blit(mapa7_img, (MAPA7_OFFSET_X - camera_x, MAPA7_OFFSET_Y - camera_y))
+                else:
+                    ventana.fill((10, 10, 70))
+                
+                # Overlay fade in
+                overlay = pygame.Surface((constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA))
+                overlay.fill((0, 0, 0))
+                overlay.set_alpha(alpha)
+                ventana.blit(overlay, (0, 0))
+                
+                escalado = pygame.transform.scale(ventana, (constantes.ANCHO_PANTALLA, constantes.ALTO_PANTALLA))
+                pantalla.blit(escalado, (0, 0))
+                pygame.display.update()
+                pygame.time.wait(30)
+       
         if mapas.mapa_actual == 1:
 
             # Cámara mapa 1
@@ -440,53 +518,49 @@ while run == True:
                 (MAPA6_OFFSET_X - camera_x, MAPA6_OFFSET_Y - camera_y)
             )
 
+        elif mapas.mapa_actual == 7:
+            # Cámara mapa 7
+            camera_x = jugador.forma.centerx - constantes.ANCHO_VENTANA // 2
+            camera_y = jugador.forma.centery - constantes.ALTO_VENTANA // 2
+
+            camera_x = max(
+                MAPA7_OFFSET_X,
+                min(camera_x, MAPA7_OFFSET_X + mapa7_w - constantes.ANCHO_VENTANA)
+            )
+            camera_y = max(
+                MAPA7_OFFSET_Y,
+                min(camera_y, MAPA7_OFFSET_Y + mapa7_h - constantes.ALTO_VENTANA)
+            )
+
+            ventana.fill((0, 0, 0))
+            ventana.blit(
+                mapa7_img,
+                (MAPA7_OFFSET_X - camera_x, MAPA7_OFFSET_Y - camera_y)
+            )
+
         else:
             camera_x = 0
             camera_y = 0
 
-        # dibujar paredes mas colisiones
+                # dibujar paredes mas colisiones
         for pared in paredes:
+            # No dibujar paredes grises en mapas con imagen grande
+            if mapas.mapa_actual not in (1, 4, 6, 7, 10):
+                pygame.draw.rect(ventana, (150, 150, 150), pared)
 
-            # No dibujar paredes grises en el edificio, mapa 1 ni mapa 4
-          if mapas.mapa_actual != 10 and mapas.mapa_actual != 4 and mapas.mapa_actual != 1 and mapas.mapa_actual != 6:
-           pygame.draw.rect(
-            ventana,
-            (150, 150, 150),
-            pared
-        )
-
-               # mostrar hitbox paredes
-           if mostrar_hitbox:
-                if mapas.mapa_actual == 1 or mapas.mapa_actual == 4 or mapas.mapa_actual == 6:
-                    pygame.draw.rect(
-                        ventana,
-                        (255, 0, 0),
-                        pygame.Rect(pared.x - camera_x, pared.y - camera_y, pared.width, pared.height),
-                        3
+            # Mostrar hitbox ROJA siempre con offset de cámara en mapas grandes
+            if mostrar_hitbox:
+                if mapas.mapa_actual in (1, 4, 6, 7):
+                    draw_rect = pygame.Rect(
+                        pared.x - camera_x,
+                        pared.y - camera_y,
+                        pared.width,
+                        pared.height
                     )
-                else:
-                    pygame.draw.rect(
-                        ventana,
-                        (255, 0, 0),
-                        pared,
-                        3
-                    )
-                   
-        if mapas.mapa_actual == 1:
-
-           bus.dibujar(ventana)
-
-           if mostrar_hitbox:
-
-            pygame.draw.rect(
-                ventana,
-                (255, 255, 0),
-                bus.rect,
-                4
-            )
-    
+                    pygame.draw.rect(ventana, (255, 0, 0), draw_rect, 3)
+       
         # dibujar jugador
-        if mapas.mapa_actual == 1 or mapas.mapa_actual == 4:
+        if mapas.mapa_actual in (1, 4, 6):
             ventana.blit(
                 jugador.image,
                 (
@@ -504,7 +578,7 @@ while run == True:
             )
         # hitbox jugador
         if mostrar_hitbox:
-            if mapas.mapa_actual == 1 or mapas.mapa_actual == 4:
+            if mapas.mapa_actual in (1, 4, 6):
                 pygame.draw.rect(
                     ventana,
                     (0, 255, 0),
@@ -538,6 +612,12 @@ while run == True:
                     ),
                     3
                 )
+
+                 # Dibujar salidas con cámara en mapa 7
+                if mapas.mapa_actual == 7 and mostrar_hitbox:
+                    if salida:
+                        draw_salida = pygame.Rect(salida.x - camera_x, salida.y - camera_y, salida.width, salida.height)
+                        pygame.draw.rect(ventana, (0, 0, 255), draw_salida, 3)
 
                 # Dibujar hitbox de salida izquierda
                 pygame.draw.rect(
@@ -594,8 +674,8 @@ while run == True:
                     mouse_real[1] * constantes.ALTO_VENTANA // constantes.ALTO_PANTALLA
                 )
                 if boton_jugar.collidepoint(mouse_pos):
-                    pygame.mixer.music.load("assets//music//musica//Awake_Celeste.mp3")
-                    pygame.mixer.music.play(-1)
+                    reproducir_musica(MUSICA_JUEGO)
+                    musica_actual = MUSICA_JUEGO
                     estado_juego = "jugando"
                 elif boton_salir.collidepoint(mouse_pos):
                     run = False
