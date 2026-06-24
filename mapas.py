@@ -44,6 +44,13 @@ mapa8_img = pygame.image.load(
     "assets/images/Map/Segundo_piso.png"
 )
 
+
+#LOGO ULAGOS
+ulagos_img = pygame.image.load(
+    "assets/images/objects/Letras_ulagos.png"
+)
+
+
 #Mapa del patio central
 paredes_mapa1 = [
     pygame.Rect(0, 0, constantes.ANCHO_VENTANA, 40),
@@ -70,6 +77,7 @@ paredes_mapa2 = [
     pygame.Rect(1200, 0, constantes.ANCHO_VENTANA - 1200, 40),
     pygame.Rect(0, 0, 40, constantes.ALTO_VENTANA),
     pygame.Rect(constantes.ANCHO_VENTANA - 40, 0, 40, constantes.ALTO_VENTANA),
+
     pygame.Rect(800, 600, 300, 200), #logo ulagos
 ]
 
@@ -182,10 +190,15 @@ paredes_oficina_profesores = [
     pygame.Rect(3461, 510, 9, 90),      # muro derecho externo
     pygame.Rect(1231, 1020, 96, 20),    # muro frontal bajo
 
+    pygame.Rect(0, 0, 5000, 590),  #pared arrinba
+    pygame.Rect(0, 1090, 1500, 1000),  #bloque raro izquierda
+    pygame.Rect(2400, 1090, 1500, 1000),  #bloque raro derecha
+    
+
     # muebles del pasillo superior
-    pygame.Rect(986, 420, 129, 226),    # extintor rojo
+   
     pygame.Rect(2230, 679, 420, 162),   # mesa con impresora
-    pygame.Rect(2780, 420, 113, 291),   # dispensador de agua
+    pygame.Rect(2790, 420, 113, 291),   # dispensador de agua
     pygame.Rect(2958, 420, 162, 291),   # archivero negro
 
     # muebles cubículo izquierdo
@@ -214,18 +227,33 @@ zona_colision_mapa7 = pygame.Rect(40, 680, 1360, 360)
 
 # Mapa 7 - Hitboxes (rojo = paredes)
 paredes_mapa7 = [
-    pygame.Rect(0, 0, 3840, 60),      # pared arriba
-    pygame.Rect(0, 0, 60, 2160),      # pared izquierda 
+    pygame.Rect(0, 60, 3840, 60),      # pared arriba
+    pygame.Rect(110, 0, 60, 2160),      # pared izquierda 
 
     # Paredes principales visibles
-    pygame.Rect(0, 60, 1500, 220),    # pared horizontal superior
-    pygame.Rect(0, 700, 680, 220),    # pared posicion inferior izquierda
-    pygame.Rect(0, 1200, 1500, 220),
-    pygame.Rect(1000, 1200, 1500, 220),
+    pygame.Rect(0, 70, 1600, 220),    # bloque raro que estaba en la pared izquierda
+    pygame.Rect(1580, 200, 220, 190), #ka ventna rara
+    pygame.Rect(1580, 600, 570, 1000), #escritorio biblioteca
+
+   
+    pygame.Rect(450, 650, 40, 40),    # pared pasillo, abajo para la puerta de la escalera
+    pygame.Rect(510, 630, 620, 44),  
+    pygame.Rect(1100, 630, 100, 500), #escalera1
+    
+    
+
+    pygame.Rect(2710, 400, 1000, 1000), #las librerias
+    pygame.Rect(2600, 600, 1000, 1000), #los escritorios
+
+    pygame.Rect(10, 700, 750, 3000), #bloque de abajo izquierda, lado izquierda de la escalera
+
+    pygame.Rect(100, 1570, 15000, 50), #pared rara que estaba al inico 
+    pygame.Rect(1600, 1190, 15000, 50), #para el sillon
+    pygame.Rect(3100, 0, 60, 2160)#pared de la derecha
 ]
 
 # Salidas (azul) - ajusta según necesites
-salida_mapa7 = pygame.Rect(50, 420, 40, 260)           # salida izquierda (volver a mapa 3)
+salida_mapa7 = pygame.Rect(140, 420, 40, 260)           # salida izquierda (volver a mapa 3)
 salida_mapa7_abajo = pygame.Rect(1440, 2110, 480, 40)  # salida inferior (hacia mapa 8 segundo piso)
 
 # nuevo mapa 9: zona debajo de mapa 7

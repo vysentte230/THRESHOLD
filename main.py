@@ -17,6 +17,12 @@ MUSICA_MAPA6 = "assets//music//musica//Brilliant Red.mp3"
 musica_actual = MUSICA_MENU
 musica_anterior = None
 
+logo_ulagos = pygame.transform.scale(
+mapas.ulagos_img,
+(300, 200)
+)
+
+
 def reproducir_musica(ruta, loop=-1):
     pygame.mixer.music.load(ruta)
     pygame.mixer.music.play(loop)
@@ -542,6 +548,12 @@ while run == True:
             camera_x = 0
             camera_y = 0
 
+        # Dibujar logo ULagos en el mapa 2
+
+        if mapas.mapa_actual == 2:
+
+            ventana.blit(logo_ulagos, (800, 600))    
+
                 # dibujar paredes mas colisiones
         for pared in paredes:
             # No dibujar paredes grises en mapas con imagen grande
@@ -560,7 +572,7 @@ while run == True:
                     pygame.draw.rect(ventana, (255, 0, 0), draw_rect, 3)
        
         # dibujar jugador
-        if mapas.mapa_actual in (1, 4, 6):
+        if mapas.mapa_actual in (1, 4, 6, 7):
             ventana.blit(
                 jugador.image,
                 (
@@ -578,7 +590,7 @@ while run == True:
             )
         # hitbox jugador
         if mostrar_hitbox:
-            if mapas.mapa_actual in (1, 4, 6):
+            if mapas.mapa_actual in (1, 4, 6, 7):
                 pygame.draw.rect(
                     ventana,
                     (0, 255, 0),
@@ -600,7 +612,7 @@ while run == True:
             
             # Dibujar hitbox de salidas en modo debug
             if mapas.mapa_actual == 4:
-                # Dibujar hitbox de salida derecha
+
                 pygame.draw.rect(
                     ventana,
                     (0, 0, 255),
@@ -613,13 +625,6 @@ while run == True:
                     3
                 )
 
-                 # Dibujar salidas con cámara en mapa 7
-                if mapas.mapa_actual == 7 and mostrar_hitbox:
-                    if salida:
-                        draw_salida = pygame.Rect(salida.x - camera_x, salida.y - camera_y, salida.width, salida.height)
-                        pygame.draw.rect(ventana, (0, 0, 255), draw_salida, 3)
-
-                # Dibujar hitbox de salida izquierda
                 pygame.draw.rect(
                     ventana,
                     (0, 0, 255),
@@ -632,6 +637,33 @@ while run == True:
                     3
                 )
 
+            elif mapas.mapa_actual == 7:
+
+                if salida:
+                    pygame.draw.rect(
+                        ventana,
+                        (0, 0, 255),
+                        pygame.Rect(
+                            salida.x - camera_x,
+                            salida.y - camera_y,
+                            salida.width,
+                            salida.height
+                        ),
+                        3
+                    )
+
+                if salida_abajo:
+                    pygame.draw.rect(
+                        ventana,
+                        (0, 0, 255),
+                        pygame.Rect(
+                            salida_abajo.x - camera_x,
+                            salida_abajo.y - camera_y,
+                            salida_abajo.width,
+                            salida_abajo.height
+                        ),
+                        3
+                    )
             else:
                 # Dibujar hitbox de salida principal para otros mapas
                 pygame.draw.rect(
