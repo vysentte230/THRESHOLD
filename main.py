@@ -111,7 +111,20 @@ mapa4_img = pygame.transform.scale(
         int(constantes.ALTO_VENTANA * MAPA4_SCALE_Y)
     )
 )
+
+# Configuración mapa 5
+MAPA5_SCALE_X = 1.0
+MAPA5_SCALE_Y = 1.0
+
+mapa5_img = pygame.transform.scale(
+    mapas.mapa5_img,
+    (
+        int(constantes.ANCHO_VENTANA * MAPA5_SCALE_X),
+        int(constantes.ALTO_VENTANA * MAPA5_SCALE_Y)
+    )
+)
 mapa4_w, mapa4_h = mapa4_img.get_size()
+
 # Configuración mapa 6 (doble de pantalla para cámara libre)
 MAPA6_SCALE_X = 2.0
 MAPA6_SCALE_Y = 2.0
@@ -699,6 +712,8 @@ while run == True:
                     camera_x = max(MAPA4_OFFSET_X, min(jugador.forma.centerx - constantes.ANCHO_VENTANA // 2, MAPA4_OFFSET_X + mapa4_w - constantes.ANCHO_VENTANA))
                     camera_y = max(MAPA4_OFFSET_Y, min(jugador.forma.centery - constantes.ALTO_VENTANA // 2, MAPA4_OFFSET_Y + mapa4_h - constantes.ALTO_VENTANA))
                     ventana.blit(mapa4_img, (MAPA4_OFFSET_X - camera_x, MAPA4_OFFSET_Y - camera_y))
+                elif mapas.mapa_actual == 5:
+                    ventana.blit(mapa5_img, (0, 0))
                 elif mapas.mapa_actual == 6:
                     camera_x = max(MAPA6_OFFSET_X, min(jugador.forma.centerx - constantes.ANCHO_VENTANA // 2, MAPA6_OFFSET_X + mapa6_w - constantes.ANCHO_VENTANA))
                     camera_y = max(MAPA6_OFFSET_Y, min(jugador.forma.centery - constantes.ALTO_VENTANA // 2, MAPA6_OFFSET_Y + mapa6_h - constantes.ALTO_VENTANA))
