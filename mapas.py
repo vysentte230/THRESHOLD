@@ -150,20 +150,23 @@ salida_mapa4_derecha = pygame.Rect(3528, 440, 40, 260)
 # salida superior de mapa 4 hacia la oficina de profesores (mapa 6)
 salida_mapa4_arriba = pygame.Rect(2200, 80, 400, 80)
 
-# mapa 5: nueva zona a la izquierda de mapa 4
+MAPA5_ANCHO = 1920 * 2
+MAPA5_ALTO = 1080 * 2
+
 paredes_mapa5 = [
-    pygame.Rect(0, 0, 40, 320),
-    pygame.Rect(0, 320, 40, 440),
-    pygame.Rect(0, 760, 40, constantes.ALTO_VENTANA - 760),
-    pygame.Rect(constantes.ANCHO_VENTANA - 40, 0, 40, 320),
-    pygame.Rect(constantes.ANCHO_VENTANA - 40, 760, 40, constantes.ALTO_VENTANA - 760),
-    pygame.Rect(0, 0, constantes.ANCHO_VENTANA, 40),
-    pygame.Rect(0, constantes.ALTO_VENTANA - 40, constantes.ANCHO_VENTANA, 40)
+    # borde superior (zona ventanas)
+    pygame.Rect(0, 0, MAPA5_ANCHO, 460),
+    # borde inferior (zona roja debajo de puertas)
+    pygame.Rect(0, 1680, MAPA5_ANCHO, 480),
+    # borde izquierdo
+    pygame.Rect(0, 0, 80, MAPA5_ALTO),
+    # borde derecho (partido para dejar la salida)
+    pygame.Rect(MAPA5_ANCHO - 80, 0, 80, 840),
+    pygame.Rect(MAPA5_ANCHO - 80, 1360, 80, MAPA5_ALTO - 1360),
 ]
 
-
 # salida derecha de retorno a mapa 4
-salida_mapa5 = pygame.Rect(constantes.ANCHO_VENTANA - 40, 420, 40, 260)
+salida_mapa5 = pygame.Rect(MAPA5_ANCHO - 80, 840, 80, 520)
 
 
 # mapa 6: oficina de profesores (mapa con cámara libre, tamaño 3840x2160)

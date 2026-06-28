@@ -4,16 +4,22 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 import pygame
 import math
 import constantes
+import random
 from personaje import Personaje
 import mapas
 from bus import Bus
-#hola brayan
+from joel import Joel
+from segovia import Segovia
+
+
 pygame.init()
 pygame.mixer.init()
 
 MUSICA_MENU = "assets//music//musica//Titulo_chill.mp3"
 MUSICA_JUEGO = "assets//music//musica//Primer_dia.mp3"
 MUSICA_MAPA6 = "assets//music//musica//Brilliant Red.mp3"
+MUSICA_MAPA7 = "assets//music//musica//biblioteca_ost.mp3"
+MUSICA_MINIJUEGO = "assets//music//musica//chill_game.mp3"
 musica_actual = MUSICA_MENU
 musica_anterior = None
 
@@ -31,12 +37,43 @@ def reproducir_musica(ruta, loop=-1):
 #aqui hace spawn
 jugador = Personaje(1450, 550)
 bus = Bus(1500, -300)
+joel = Joel(100, 700)
+segovia = Segovia(100, 1050)
 
 fondo_menu = pygame.image.load("assets//images/Menu//Menu.png")
 reproducir_musica(MUSICA_MENU)
 
 
 fondo_menu = pygame.transform.scale(fondo_menu,( constantes.ANCHO_VENTANA,constantes.ALTO_VENTANA))
+
+biblioteca_img = pygame.transform.scale(
+    pygame.image.load("assets/images/Map/biblioteca_minijuego.png"),
+    (constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA)
+)
+
+# Hitboxes de los libros en pantalla (1920x1080)
+def generar_libros():
+    libros = []
+    filas = [
+        {"y": 109, "h": 183},
+        {"y": 309, "h": 181},
+        {"y": 503, "h": 181},
+        {"y": 700, "h": 219},
+    ]
+    secciones = [
+        {"x_inicio": 67, "cantidad": 16},
+        {"x_inicio": 660, "cantidad": 16},
+        {"x_inicio": 1272, "cantidad": 16},
+    ]
+    for fila in filas:
+        for seccion in secciones:
+            x = seccion["x_inicio"]
+            for _ in range(seccion["cantidad"]):
+                libros.append(pygame.Rect(x, fila["y"], 34, fila["h"]))
+                x += 36
+    return libros
+
+libros_hitboxes = generar_libros()
 
 ventana = pygame.Surface((constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA))
 pantalla = pygame.display.set_mode((constantes.ANCHO_PANTALLA, constantes.ALTO_PANTALLA))
@@ -80,6 +117,21 @@ MAPA6_SCALE_X = 2.0
 MAPA6_SCALE_Y = 2.0
 MAPA6_OFFSET_X = 0
 MAPA6_OFFSET_Y = 0
+
+# Configuración mapa 5 (pasillo, cámara libre)
+MAPA5_SCALE_X = 2.0
+MAPA5_SCALE_Y = 2.0
+MAPA5_OFFSET_X = 0
+MAPA5_OFFSET_Y = 0
+
+mapa5_img = pygame.transform.scale(
+    mapas.mapa5_img,
+    (
+        int(constantes.ANCHO_VENTANA * MAPA5_SCALE_X),
+        int(constantes.ALTO_VENTANA * MAPA5_SCALE_Y)
+    )
+)
+mapa5_w, mapa5_h = mapa5_img.get_size()
 
 mapa6_img = pygame.transform.scale(
     mapas.mapa6_img,
@@ -140,6 +192,163 @@ def dibujar_texto_glow(ventana, texto, fuente, color, pos, intensidad=4, alpha_g
         ventana.blit(superficie_glow, (x + dx, y + dy))
 
     ventana.blit(superficie, (x, y))
+
+fuente_dialogo = pygame.font.Font("assets/fonts/PressStart2p.ttf", 18)
+fuente_nombre = pygame.font.Font("assets/fonts/PressStart2p.ttf", 22)
+
+def dibujar_dialogo_joel(ventana, texto, pagina, total):
+    # fondo caja
+    caja = pygame.Rect(40, constantes.ALTO_VENTANA - 280, constantes.ANCHO_VENTANA - 80, 240)
+    fondo = pygame.Surface((caja.width, caja.height), pygame.SRCALPHA)
+    fondo.fill((10, 10, 30, 210))
+    ventana.blit(fondo, (caja.x, caja.y))
+    pygame.draw.rect(ventana, (100, 140, 255), caja, 3)
+
+    # nombre
+    nombre_surf = fuente_nombre.render("Prof. Joel", True, (150, 200, 255))
+    ventana.blit(nombre_surf, (caja.x + 20, caja.y - 36))
+
+    # texto (soporta \n)
+    lineas = texto.split("\n")
+    for i, linea in enumerate(lineas):
+        surf = fuente_dialogo.render(linea, True, (255, 255, 255))
+        ventana.blit(surf, (caja.x + 20, caja.y + 20 + i * 36))
+
+    # indicador continuar
+    if pagina < total - 1:
+        ind = fuente_dialogo.render("[ E ] Continuar", True, (180, 180, 255))
+    else:
+        ind = fuente_dialogo.render("[ E ] Cerrar", True, (180, 180, 255))
+    ventana.blit(ind, (caja.right - 320, caja.bottom - 36))    
+
+def dibujar_dialogo_segovia(ventana, texto, pagina, total):
+    caja = pygame.Rect(40, constantes.ALTO_VENTANA - 280, constantes.ANCHO_VENTANA - 80, 240)
+    fondo = pygame.Surface((caja.width, caja.height), pygame.SRCALPHA)
+    fondo.fill((30, 10, 10, 210))
+    ventana.blit(fondo, (caja.x, caja.y))
+    pygame.draw.rect(ventana, (255, 60, 60), caja, 3)
+
+    nombre_surf = fuente_nombre.render("Prof. Segovia", True, (255, 120, 120))
+    ventana.blit(nombre_surf, (caja.x + 20, caja.y - 36))
+
+    lineas = texto.split("\n")
+    for i, linea in enumerate(lineas):
+        surf = fuente_dialogo.render(linea, True, (255, 255, 255))
+        ventana.blit(surf, (caja.x + 20, caja.y + 20 + i * 36))
+
+    if pagina < total - 1:
+        ind = fuente_dialogo.render("[ E ] Continuar", True, (255, 150, 150))
+    else:
+        ind = fuente_dialogo.render("[ E ] Cerrar", True, (255, 150, 150))
+    ventana.blit(ind, (caja.right - 320, caja.bottom - 36))
+
+def dibujar_instructivo_biblioteca(ventana):
+    fondo = pygame.Surface((constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA), pygame.SRCALPHA)
+    fondo.fill((0, 0, 0, 180))
+    ventana.blit(fondo, (0, 0))
+
+    caja = pygame.Rect(400, 200, 1120, 680)
+    pygame.draw.rect(ventana, (10, 10, 30), caja)
+    pygame.draw.rect(ventana, (100, 140, 255), caja, 3)
+
+    titulo = fuente_nombre.render("MISION: BIBLIOTECA", True, (150, 200, 255))
+    ventana.blit(titulo, (caja.centerx - titulo.get_width()//2, caja.y + 30))
+
+    instrucciones = [
+        "El Profesor Segovia te encargo buscar un libro.",
+        "",
+        "- Un libro se iluminara en la estanteria.",
+        "- Clickealo antes de que se apague.",
+        "- Acertar suma 2 segundos.",
+        "- Fallar resta 3 segundos.",
+        "- Si el libro se apaga solo resta 3 segundos.",
+        "",
+        f"Libros a encontrar: 15",
+        f"Tiempo inicial: 17 segundos",
+        f"Tiempo de reaccion: 3.5 segundos",
+    ]
+    for i, linea in enumerate(instrucciones):
+        color = (255, 255, 255) if linea != "" else (255, 255, 255)
+        surf = fuente_dialogo.render(linea, True, color)
+        ventana.blit(surf, (caja.x + 40, caja.y + 90 + i * 42))
+
+    boton = pygame.Rect(caja.centerx - 120, caja.bottom - 80, 240, 50)
+    mouse_real = pygame.mouse.get_pos()
+    mouse_pos = (
+        mouse_real[0] * constantes.ANCHO_VENTANA // constantes.ANCHO_PANTALLA,
+        mouse_real[1] * constantes.ALTO_VENTANA // constantes.ALTO_PANTALLA
+    )
+    color_boton = (100, 180, 255) if boton.collidepoint(mouse_pos) else (50, 120, 200)
+    pygame.draw.rect(ventana, color_boton, boton)
+    pygame.draw.rect(ventana, (150, 200, 255), boton, 2)
+    txt = fuente_dialogo.render("INICIAR", True, (255, 255, 255))
+    ventana.blit(txt, (boton.centerx - txt.get_width()//2, boton.centery - txt.get_height()//2))
+
+    return boton
+
+
+def dibujar_teclas_tutorial(ventana, alpha):
+    TAM = 60       # tamaño del icono de tecla
+    GAP = 12       # separación entre teclas
+    RADIO = 8      # radio bordes redondeados
+    surf_w = TAM * 3 + GAP * 2
+    surf_h = TAM * 2 + GAP
+    surf = pygame.Surface((surf_w, surf_h), pygame.SRCALPHA)
+
+    fuente_tecla = pygame.font.Font("assets/fonts/PressStart2p.ttf", 14)
+
+    def key(letra, cx, cy):
+        # fondo tecla
+        pygame.draw.rect(surf, (30, 30, 40, alpha), (cx, cy, TAM, TAM), border_radius=RADIO)
+        # borde exterior luminoso
+        pygame.draw.rect(surf, (120, 170, 255, alpha), (cx, cy, TAM, TAM), 3, border_radius=RADIO)
+        # borde inferior mas oscuro (efecto 3D)
+        pygame.draw.rect(surf, (60, 100, 180, alpha), (cx + 3, cy + TAM - 6, TAM - 6, 6), border_radius=3)
+        # letra
+        txt = fuente_tecla.render(letra, True, (220, 230, 255))
+        txt.set_alpha(alpha)
+        surf.blit(txt, (cx + TAM // 2 - txt.get_width() // 2,
+                        cy + TAM // 2 - txt.get_height() // 2 - 2))
+
+    # W arriba centrado
+    key("W", surf_w // 2 - TAM // 2, 0)
+    # A S D abajo
+    key("A", 0,               TAM + GAP)
+    key("S", TAM + GAP,       TAM + GAP)
+    key("D", TAM * 2 + GAP * 2, TAM + GAP)
+
+    # Posición: parte baja de la pantalla, centrado
+    pos_x = constantes.ANCHO_VENTANA // 2 - surf_w // 2
+    pos_y = constantes.ALTO_VENTANA - surf_h - 80
+    ventana.blit(surf, (pos_x, pos_y))
+
+
+def dibujar_minijuego_biblioteca(ventana, tiempo, libros_correctos, libro_iluminado, libro_timer):
+    ventana.blit(biblioteca_img, (0, 0))
+
+    # iluminar libro activo
+    if libro_iluminado >= 0 and libro_iluminado < len(libros_hitboxes):
+        # Neon orange outer glow
+        pygame.draw.rect(ventana, (255, 100, 0), libros_hitboxes[libro_iluminado].inflate(8, 8), 2)
+        # Neon yellow inner thick border
+        pygame.draw.rect(ventana, (255, 255, 0), libros_hitboxes[libro_iluminado], 6)
+        # Translucent bright yellow fill
+        s = pygame.Surface((libros_hitboxes[libro_iluminado].width, libros_hitboxes[libro_iluminado].height), pygame.SRCALPHA)
+        s.fill((255, 255, 0, 130))
+        ventana.blit(s, libros_hitboxes[libro_iluminado].topleft)
+
+    # HUD
+    pygame.draw.rect(ventana, (10, 10, 30, 180), pygame.Rect(0, 0, constantes.ANCHO_VENTANA, 60))
+    t_surf = fuente_dialogo.render(f"Tiempo: {tiempo:.1f}s", True, (255, 255, 100) if tiempo > 8 else (255, 80, 80))
+    ventana.blit(t_surf, (30, 18))
+    l_surf = fuente_dialogo.render(f"Libros: {libros_correctos}/15", True, (150, 200, 255))
+    ventana.blit(l_surf, (400, 18))
+
+    # barra timer libro
+    if libro_iluminado >= 0:
+        barra_ancho = int((libro_timer / libro_tiempo_reaccion) * 400)
+        pygame.draw.rect(ventana, (60, 60, 60), pygame.Rect(constantes.ANCHO_VENTANA - 430, 18, 400, 24))
+        pygame.draw.rect(ventana, (100, 220, 100), pygame.Rect(constantes.ANCHO_VENTANA - 430, 18, barra_ancho, 24))
 
 
 def obtener_variables_mapa(mapa):
@@ -205,6 +414,39 @@ def posicionar_jugador_entrada(salida_rect, lado, jugador):
 run = True
 mostrar_hitbox = False
 cooldown_mapa = 0
+joel_hablado = False
+cerca_segovia = False
+
+dialogo_joel_activo = False
+dialogo_joel_pagina = 0
+dialogo_joel_textos = []
+joel_hablado = False
+
+dialogo_segovia_activo = False
+dialogo_segovia_pagina = 0
+dialogo_segovia_textos = []
+segovia_hablado = False
+
+# Minijuego biblioteca
+minijuego_activo = False
+minijuego_instructivo = False
+minijuego_completado = False
+mision_biblioteca_activa = False  # Locked until Segovia talks to the player
+
+libro_iluminado = -1
+libro_timer = 0
+libro_tiempo_reaccion = 3.5
+libros_correctos = 0
+libros_objetivo = 15
+tiempo_minijuego = 17.0
+cerca_libreria = False
+minijuego_click_procesado = False
+boton_iniciar = pygame.Rect(0, 0, 0, 0)
+
+# Tutorial mapa 1
+tutorial_timer = 5.0
+tutorial_alpha = 255
+
 
 while run == True:
 
@@ -216,7 +458,7 @@ while run == True:
 
     ventana.fill(constantes.COLOR_BG)
 
-    if estado_juego == "menu":
+    if estado_juego == "menu": 
      ventana.blit(fondo_menu, (0, 0))
 
      colores_titulo = [
@@ -276,17 +518,18 @@ while run == True:
         delta_x = 0
         delta_y = 0
 
-        if teclas[pygame.K_w] or teclas[pygame.K_UP]:
-            delta_y = -velocidad_actual
+        if not dialogo_joel_activo and not dialogo_segovia_activo and not minijuego_activo and not minijuego_instructivo:
+            if teclas[pygame.K_w] or teclas[pygame.K_UP]:
+                delta_y = -velocidad_actual
 
-        if teclas[pygame.K_s] or teclas[pygame.K_DOWN]:
-            delta_y = velocidad_actual
+            if teclas[pygame.K_s] or teclas[pygame.K_DOWN]:
+                delta_y = velocidad_actual
 
-        if teclas[pygame.K_a] or teclas[pygame.K_LEFT]:
-            delta_x = -velocidad_actual
+            if teclas[pygame.K_a] or teclas[pygame.K_LEFT]:
+                delta_x = -velocidad_actual
 
-        if teclas[pygame.K_d] or teclas[pygame.K_RIGHT]:
-            delta_x = velocidad_actual
+            if teclas[pygame.K_d] or teclas[pygame.K_RIGHT]:
+                delta_x = velocidad_actual
 
         salida_abajo = None
         salida_izquierda = None
@@ -299,11 +542,13 @@ while run == True:
             if jugador.forma.colliderect(bus.rect):
                 velocidad_actual = 2
 
-        jugador.movimiento(delta_x, delta_y, paredes)
-        print("Jugador Y:", jugador.forma.top, "- Salida arriba:", mapas.salida_mapa4_arriba)
-        for pared in paredes:
-            if jugador.forma.colliderect(pared):
-             print("CHOCANDO CON:", pared)
+        paredes_con_npcs = paredes.copy()
+        if mapas.mapa_actual == 6:
+           paredes_con_npcs.append(joel.hitbox)
+        if mapas.mapa_actual == 5:
+            paredes_con_npcs.append(segovia.hitbox)
+
+        jugador.movimiento(delta_x, delta_y, paredes_con_npcs)
 
         # cambiar mapa
         cambio_mapa = False
@@ -338,6 +583,11 @@ while run == True:
                 elif jugador.forma.colliderect(mapas.salida_mapa3_derecha):
                     mapas.mapa_actual = 7
                     posicionar_jugador_entrada(mapas.salida_mapa7, "izquierda", jugador)
+                    # Entrar a biblioteca - activar musica biblioteca
+                    if musica_actual != MUSICA_MAPA7:
+                        musica_anterior = musica_actual
+                        reproducir_musica(MUSICA_MAPA7)
+                        musica_actual = MUSICA_MAPA7
                     cooldown_mapa = 30
                     cambio_mapa = True
                 elif jugador.forma.colliderect(salida_abajo):
@@ -387,11 +637,21 @@ while run == True:
             elif mapas.mapa_actual == 7 and jugador.forma.colliderect(salida):
                 mapas.mapa_actual = 3
                 posicionar_jugador_entrada(mapas.salida_mapa3_derecha, "derecha", jugador)
+                # Salir de biblioteca - restaurar musica anterior
+                if musica_actual == MUSICA_MAPA7:
+                    reproducir_musica(musica_anterior or MUSICA_JUEGO)
+                    musica_actual = musica_anterior or MUSICA_JUEGO
+                    musica_anterior = None
                 cooldown_mapa = 30
                 cambio_mapa = True
             elif mapas.mapa_actual == 7 and jugador.forma.colliderect(salida_abajo):
                 mapas.mapa_actual = 9
                 posicionar_jugador_entrada(mapas.salida_mapa9, "arriba", jugador)
+                # Salir de biblioteca - restaurar musica anterior
+                if musica_actual == MUSICA_MAPA7:
+                    reproducir_musica(musica_anterior or MUSICA_JUEGO)
+                    musica_actual = musica_anterior or MUSICA_JUEGO
+                    musica_anterior = None
                 cooldown_mapa = 30
                 cambio_mapa = True
             elif mapas.mapa_actual == 8 and jugador.forma.colliderect(salida):
@@ -483,6 +743,17 @@ while run == True:
                 (MAPA1_OFFSET_X - camera_x, MAPA1_OFFSET_Y - camera_y)
             )
 
+            # === TUTORIAL MAPA 1 - iconos de teclas WASD con fade ===
+            if tutorial_timer > 0:
+                dt_tut = reloj.get_time() / 1000.0
+                tutorial_timer = max(0.0, tutorial_timer - dt_tut)
+                if tutorial_timer < 1.5:
+                    tutorial_alpha = max(0, int((tutorial_timer / 1.5) * 255))
+                else:
+                    tutorial_alpha = 255
+                dibujar_teclas_tutorial(ventana, tutorial_alpha)
+
+
         elif mapas.mapa_actual == 4:
 
             # Cámara mapa 4
@@ -505,6 +776,54 @@ while run == True:
                 (MAPA4_OFFSET_X - camera_x, MAPA4_OFFSET_Y - camera_y)
             )
 
+        elif mapas.mapa_actual == 5:
+
+            #Camara mapa 5
+            camera_x = jugador.forma.centerx - constantes.ANCHO_VENTANA // 2
+            camera_y = jugador.forma.centery - constantes.ALTO_VENTANA // 2
+
+            camera_x = max(
+                MAPA5_OFFSET_X,
+                min(camera_x, MAPA5_OFFSET_X + mapa5_w - constantes.ANCHO_VENTANA)
+            )
+            camera_y = max(
+                MAPA5_OFFSET_Y,
+                min(camera_y, MAPA5_OFFSET_Y + mapa5_h - constantes.ALTO_VENTANA)
+            )
+
+            ventana.fill((0, 0, 0))
+            ventana.blit(
+                mapa5_img,
+                (MAPA5_OFFSET_X - camera_x, MAPA5_OFFSET_Y - camera_y)
+            )
+            segovia.animar()
+            segovia.dibujar(ventana, camera_x, camera_y)
+            segovia.hitbox.x = segovia.rect.x
+            segovia.hitbox.y = segovia.rect.y
+
+            cerca_segovia = jugador.forma.colliderect(
+                pygame.Rect(segovia.rect.x - 150, segovia.rect.y - 100, 400, 350)
+            )
+            if cerca_segovia and not dialogo_segovia_activo:
+                if joel_hablado:
+                    prompt = fuente_dialogo.render("[ E ] Hablar", True, (100, 200, 255))
+                else:
+                    prompt = fuente_dialogo.render("Habla con Joel primero", True, (255, 120, 60))
+                ventana.blit(prompt, (
+                    segovia.rect.x - camera_x - 20,
+                    segovia.rect.y - camera_y - 50
+                ))
+            if dialogo_segovia_activo:
+                dibujar_dialogo_segovia(
+                    ventana,
+                    dialogo_segovia_textos[dialogo_segovia_pagina],
+                    dialogo_segovia_pagina,
+                    len(dialogo_segovia_textos)
+                )
+            
+
+
+
         elif mapas.mapa_actual == 6:
             camera_x = jugador.forma.centerx - constantes.ANCHO_VENTANA // 2
             camera_y = jugador.forma.centery - constantes.ALTO_VENTANA // 2
@@ -523,26 +842,105 @@ while run == True:
                 mapa6_img,
                 (MAPA6_OFFSET_X - camera_x, MAPA6_OFFSET_Y - camera_y)
             )
+            joel.animar()
+            joel.dibujar(ventana, camera_x, camera_y)
+
+            # prompt acercarse a joel
+            zona_joel = pygame.Rect(joel.rect.x - 150, joel.rect.y - 100, 400, 350)
+            jugador_en_pantalla = pygame.Rect(
+                jugador.forma.x - camera_x,
+                jugador.forma.y - camera_y,
+                jugador.forma.width,
+                jugador.forma.height
+            )
+            joel_en_pantalla = pygame.Rect(
+                joel.rect.x - camera_x,
+                joel.rect.y - camera_y,
+                zona_joel.width,
+                zona_joel.height
+            )
+            cerca_joel = jugador.forma.colliderect(
+                pygame.Rect(joel.rect.x - 150, joel.rect.y - 100, 400, 350)
+            )
+            if cerca_joel and not dialogo_joel_activo:
+                prompt = fuente_dialogo.render("[ E ] Hablar", True, (255, 255, 255))
+                ventana.blit(prompt, (
+                    joel.rect.x - camera_x - 20,
+                    joel.rect.y - camera_y - 50
+                ))
+
+            if dialogo_joel_activo:
+                dibujar_dialogo_joel(
+                    ventana,
+                    dialogo_joel_textos[dialogo_joel_pagina],
+                    dialogo_joel_pagina,
+                    len(dialogo_joel_textos)
+                )
+            
 
         elif mapas.mapa_actual == 7:
-            # Cámara mapa 7
-            camera_x = jugador.forma.centerx - constantes.ANCHO_VENTANA // 2
-            camera_y = jugador.forma.centery - constantes.ALTO_VENTANA // 2
+            if minijuego_instructivo:
+                # Pausar musica biblioteca durante instructivo
+                if musica_actual == MUSICA_MAPA7:
+                    pygame.mixer.music.pause()
+                paredes = []
+                boton_iniciar = dibujar_instructivo_biblioteca(ventana)
+            elif minijuego_activo:
+                # Reproducir musica minijuego si no esta sonando
+                if musica_actual != MUSICA_MINIJUEGO:
+                    reproducir_musica(MUSICA_MINIJUEGO)
+                    musica_actual = MUSICA_MINIJUEGO
+                paredes = []
+                dt = reloj.get_time() / 1000.0
+                tiempo_minijuego -= dt
+                libro_timer -= dt
 
-            camera_x = max(
-                MAPA7_OFFSET_X,
-                min(camera_x, MAPA7_OFFSET_X + mapa7_w - constantes.ANCHO_VENTANA)
-            )
-            camera_y = max(
-                MAPA7_OFFSET_Y,
-                min(camera_y, MAPA7_OFFSET_Y + mapa7_h - constantes.ALTO_VENTANA)
-            )
+                if libro_iluminado == -1:
+                    libro_iluminado = random.randint(0, len(libros_hitboxes) - 1)
+                    libro_timer = libro_tiempo_reaccion
 
-            ventana.fill((0, 0, 0))
-            ventana.blit(
-                mapa7_img,
-                (MAPA7_OFFSET_X - camera_x, MAPA7_OFFSET_Y - camera_y)
-            )
+                if libro_timer <= 0 and libro_iluminado >= 0:
+                    tiempo_minijuego -= 3
+                    libro_iluminado = random.randint(0, len(libros_hitboxes) - 1)
+                    libro_timer = libro_tiempo_reaccion
+
+                if tiempo_minijuego <= 0:
+                    tiempo_minijuego = 0
+                    minijuego_activo = False
+                    # Restaurar musica biblioteca al terminar (tiempo agotado)
+                    reproducir_musica(MUSICA_MAPA7)
+                    musica_actual = MUSICA_MAPA7
+
+                dibujar_minijuego_biblioteca(ventana, tiempo_minijuego, libros_correctos, libro_iluminado, libro_timer)
+            else:
+                # Cámara mapa 7
+                camera_x = jugador.forma.centerx - constantes.ANCHO_VENTANA // 2
+                camera_y = jugador.forma.centery - constantes.ALTO_VENTANA // 2
+
+                camera_x = max(
+                    MAPA7_OFFSET_X,
+                    min(camera_x, MAPA7_OFFSET_X + mapa7_w - constantes.ANCHO_VENTANA)
+                )
+                camera_y = max(
+                    MAPA7_OFFSET_Y,
+                    min(camera_y, MAPA7_OFFSET_Y + mapa7_h - constantes.ALTO_VENTANA)
+                )
+
+                ventana.fill((0, 0, 0))
+                ventana.blit(
+                    mapa7_img,
+                    (MAPA7_OFFSET_X - camera_x, MAPA7_OFFSET_Y - camera_y)
+                )
+
+                cerca_libreria = jugador.forma.colliderect(
+                    pygame.Rect(2300, 400, 500, 800)
+                )
+                if cerca_libreria and mision_biblioteca_activa and not minijuego_completado:
+                    prompt = fuente_dialogo.render("[ E ] Buscar libro", True, (80, 180, 255))
+                    ventana.blit(prompt, (
+                        jugador.forma.centerx - camera_x - prompt.get_width() // 2,
+                        jugador.forma.top - camera_y - 60
+                    ))
 
         else:
             camera_x = 0
@@ -557,12 +955,12 @@ while run == True:
                 # dibujar paredes mas colisiones
         for pared in paredes:
             # No dibujar paredes grises en mapas con imagen grande
-            if mapas.mapa_actual not in (1, 4, 6, 7, 10):
+            if mapas.mapa_actual not in (1, 4, 5, 6, 7, 10):
                 pygame.draw.rect(ventana, (150, 150, 150), pared)
 
             # Mostrar hitbox ROJA siempre con offset de cámara en mapas grandes
             if mostrar_hitbox:
-                if mapas.mapa_actual in (1, 4, 6, 7):
+                if mapas.mapa_actual in (1, 4, 5, 6, 7):
                     draw_rect = pygame.Rect(
                         pared.x - camera_x,
                         pared.y - camera_y,
@@ -572,14 +970,15 @@ while run == True:
                     pygame.draw.rect(ventana, (255, 0, 0), draw_rect, 3)
        
         # dibujar jugador
-        if mapas.mapa_actual in (1, 4, 6, 7):
-            ventana.blit(
-                jugador.image,
-                (
-                    jugador.forma.x - jugador.sprite_offset.x - camera_x,
-                    jugador.forma.y - jugador.sprite_offset.y - camera_y
+        if mapas.mapa_actual in (1, 4, 5, 6, 7):
+            if not minijuego_activo and not minijuego_instructivo:
+                ventana.blit(
+                    jugador.image,
+                    (
+                        jugador.forma.x - jugador.sprite_offset.x - camera_x,
+                        jugador.forma.y - jugador.sprite_offset.y - camera_y
+                    )
                 )
-            )
         else:
             ventana.blit(
                 jugador.image,
@@ -589,8 +988,8 @@ while run == True:
                 )
             )
         # hitbox jugador
-        if mostrar_hitbox:
-            if mapas.mapa_actual in (1, 4, 6, 7):
+        if mostrar_hitbox and not minijuego_activo and not minijuego_instructivo:
+            if mapas.mapa_actual in (1, 4, 5, 6, 7):
                 pygame.draw.rect(
                     ventana,
                     (0, 255, 0),
@@ -690,10 +1089,11 @@ while run == True:
                         salida_izquierda,
                         3
                     )
+                    
 
     
-    for event in pygame.event.get():
 
+    for event in pygame.event.get():
         # cerrar ventana
         if event.type == pygame.QUIT:
             run = False
@@ -713,6 +1113,41 @@ while run == True:
                     run = False
 
         if estado_juego == "jugando":
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_real = event.pos
+                mouse_pos = (
+                    mouse_real[0] * constantes.ANCHO_VENTANA // constantes.ANCHO_PANTALLA,
+                    mouse_real[1] * constantes.ALTO_VENTANA // constantes.ALTO_PANTALLA
+                )
+                if minijuego_instructivo:
+                    if boton_iniciar.collidepoint(mouse_pos):
+                        minijuego_instructivo = False
+                        minijuego_activo = True
+                        libro_iluminado = random.randint(0, len(libros_hitboxes) - 1)
+                        libro_timer = libro_tiempo_reaccion
+                        # Arrancar musica del minijuego
+                        reproducir_musica(MUSICA_MINIJUEGO)
+                        musica_actual = MUSICA_MINIJUEGO
+                elif minijuego_activo:
+                    if libro_iluminado >= 0 and libro_iluminado < len(libros_hitboxes):
+                        libro_correcto = libros_hitboxes[libro_iluminado]
+                        if libro_correcto.collidepoint(mouse_pos):
+                            tiempo_minijuego += 2
+                            libros_correctos += 1
+                            if libros_correctos >= libros_objetivo:
+                                minijuego_activo = False
+                                minijuego_completado = True
+                                mision_biblioteca_activa = False
+                                # Minijuego completado - restaurar musica biblioteca
+                                reproducir_musica(MUSICA_MAPA7)
+                                musica_actual = MUSICA_MAPA7
+                            else:
+                                libro_iluminado = random.randint(0, len(libros_hitboxes) - 1)
+                                libro_timer = libro_tiempo_reaccion
+                        else:
+                            tiempo_minijuego -= 3
+
+            
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_c:
                     mostrar_hitbox = not mostrar_hitbox
@@ -724,6 +1159,64 @@ while run == True:
                     mover_arriba = True
                 if event.key == pygame.K_s or event.key == pygame.K_DOWN:
                     mover_abajo = True
+                if event.key == pygame.K_e:
+                    if mapas.mapa_actual == 6:
+                        if dialogo_joel_activo:
+                            dialogo_joel_pagina += 1
+                            if dialogo_joel_pagina >= len(dialogo_joel_textos):
+                                dialogo_joel_activo = False
+                                dialogo_joel_pagina = 0
+                                joel_hablado = True
+                        elif cerca_joel:
+                            dialogo_joel_activo = True
+                            if joel_hablado:
+                                dialogo_joel_textos = [
+                                    "Estas esperando algo...?"
+                                ]
+                            else:
+                                dialogo_joel_textos = [
+                                    "Buena chiquillo, bienvenido a la Universidad de Los Lagos.\nMe llamo Joel, sere tu profesor de la facultad de ingenieria.",
+                                    "En este momento no dare clases, estoy en mi descanso.\nPero revisando tu horario, Tienes Matematicas con el Profesor Segovia.",
+                                    "Deberias ir a buscarlo, creo haberlo visto por el pasillo a la izquierda.\n Lo mas seguro es que fue a pedir un cafe.",
+                                    "Pero bueno chico no te entretengo mas, suerte en tu primer dia de clases y cuidate."
+                                ]
+                    if mapas.mapa_actual == 5:
+                        if dialogo_segovia_activo:
+                            dialogo_segovia_pagina += 1
+                            if dialogo_segovia_pagina >= len(dialogo_segovia_textos):
+                                dialogo_segovia_activo = False
+                                dialogo_segovia_pagina = 0
+                                if not segovia_hablado:
+                                    mision_biblioteca_activa = True
+                                segovia_hablado = True
+                        elif cerca_segovia and joel_hablado:
+                            dialogo_segovia_activo = True
+                            if minijuego_completado:
+                                dialogo_segovia_textos = [
+                                    "¡Excelente trabajo! Veo que conseguiste el libro, perfecto chico ya estas listo para la clase."
+                                ]
+                            elif segovia_hablado:
+                                dialogo_segovia_textos = [
+                                    "Ya te dije todo lo que necesitas saber. Ve a la biblioteca por el libro."
+                                ]
+                            else:
+                                dialogo_segovia_textos = [
+                                    "Ah, hola joven, asique eres el nuevo estudiante, bienvenido.\nSoy el profesor Segovia.",
+                                    "Y la clases de primer año sera de introduccion a la Matematica.\nPero antes de nada, te recomiendo tener el libro intro a la matematica.",
+                                    "tienes que ir a la biblioteca, se encuentra a la derecha saliendo de este edificio.\ny sera mejor que te des prisa.",
+                                    "Porque nada mas me termine este cafe empezare la clase.",
+                                    "Asique no tienes mucho tiempo que digamos.\nvuelve conmigo cuando ya lo tengas, suerte."
+                                ]
+                    if mapas.mapa_actual == 7:
+                        if cerca_libreria and mision_biblioteca_activa and not minijuego_completado:
+                            minijuego_instructivo = True
+                            tiempo_minijuego = 17.0
+                            libros_correctos = 0
+                            libro_iluminado = -1
+                    
+
+
+                            
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_a or event.key == pygame.K_LEFT:
@@ -734,6 +1227,9 @@ while run == True:
                     mover_arriba = False
                 if event.key == pygame.K_s or event.key == pygame.K_DOWN:
                     mover_abajo = False
+                
+
+                    
 
     escalado = pygame.transform.scale(ventana, (constantes.ANCHO_PANTALLA, constantes.ALTO_PANTALLA))
     pantalla.blit(escalado, (0, 0))

@@ -1,7 +1,6 @@
 import constantes
 import pygame
 
-
 class Bus():
 
     def __init__(self, x, y):
