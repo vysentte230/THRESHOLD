@@ -28,11 +28,10 @@ class Bus():
         self.velocidad = 5
 
     def mover(self):
-
         self.rect.y += self.velocidad
 
-        # reaparecer arriba(lo usare con otros vehiculos)
         if self.rect.y > constantes.ALTO_VENTANA:
+            self.rect.y = -self.rect.height
 
             self.velocidad = 0
 

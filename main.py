@@ -29,9 +29,9 @@ mapas.ulagos_img,
 )
 
 
-def reproducir_musica(ruta, loop=-1):
+def reproducir_musica(ruta, loop=-1, inicio=0):
     pygame.mixer.music.load(ruta)
-    pygame.mixer.music.play(loop)
+    pygame.mixer.music.play(loop, start=inicio)
 
 
 #aqui hace spawn
@@ -170,6 +170,32 @@ mapa7_img = pygame.transform.scale(
 mapa7_w, mapa7_h = mapa7_img.get_size()
 
 estado_juego = "menu"
+
+# Intro
+intro_textos = [
+    "Saludos, veo que eres nuevo por aqui.",
+    "Eso es bueno, muy bueno.",
+    "Veo que te dirijes a la universidad, se te nota.",
+    "pero tranquilo, no pongas esa cara.",
+    "Apenas ni pusiste un pie en el lugar.",
+    "No pasa nada es normal, nadie es capaz de saber",
+    "su propio destino...."
+]
+intro_linea_actual = 0
+intro_char_actual = 0
+intro_texto_visible = ""
+intro_timer = 0
+intro_velocidad = 3
+intro_espera = 0
+intro_completada = False
+intro_fade_alpha = 0
+intro_fade_saliendo = False
+intro_ultimo_texto = False
+sonido_dialogo = pygame.mixer.Sound("assets/music/text sound/dialogo_sound.MP3")
+sonido_dialogo.set_volume(0.15)
+sonido_boton = pygame.mixer.Sound("assets/music/Effect sound/sound_boton.mp3")
+sonido_boton.set_volume(0.5)
+MUSICA_INTRO = "assets/music/musica/Begind_Ambient.mp3"
 
 # varibles movimiento
 mover_arriba = False
@@ -423,6 +449,7 @@ def posicionar_jugador_entrada(salida_rect, lado, jugador):
     elif lado == "derecha":
         jugador.forma.centerx = salida_rect.left - jugador.forma.width // 2 - 30
         jugador.forma.centery = salida_rect.centery
+    
 
 run = True
 mostrar_hitbox = False
@@ -520,6 +547,117 @@ while run == True:
      else:
          texto_salir = render_pixelado(fuente_boton, "SALIR", color_salir)
          ventana.blit(texto_salir, (boton_salir.x + 30, boton_salir.y + 10))
+
+    elif estado_juego == "intro":
+        ventana.fill((0, 0, 0))
+
+        if not intro_fade_saliendo:
+            if intro_linea_actual < len(intro_textos):
+                intro_timer += 1
+                if intro_timer >= intro_velocidad:
+                    intro_timer = 0
+                    if intro_char_actual < len(intro_textos[intro_linea_actual]):
+                        intro_texto_visible += intro_textos[intro_linea_actual][intro_char_actual]
+                        intro_char_actual += 1
+                        sonido_dialogo.play()
+                    else:
+                        intro_espera += 1
+                        if intro_espera >= 40:
+                            intro_espera = 0
+                            intro_linea_actual += 1
+                            intro_char_actual = 0
+                            intro_texto_visible = ""
+            else:
+                intro_fade_saliendo = True
+                intro_fade_alpha = 0
+
+            palabras = intro_texto_visible.split(" ")
+            lineas_render = []
+            linea_temp = ""
+            for palabra in palabras:
+                test = linea_temp + palabra + " "
+                if fuente_boton.size(test)[0] > constantes.ANCHO_VENTANA - 200:
+                    lineas_render.append(linea_temp)
+                    linea_temp = palabra + " "
+                else:
+                    linea_temp = test
+            lineas_render.append(linea_temp)
+            total_h = len(lineas_render) * (fuente_boton.get_height() + 10)
+            y_inicio = constantes.ALTO_VENTANA // 2 - total_h // 2
+            for i, lr in enumerate(lineas_render):
+                s = fuente_boton.render(lr, True, (255, 255, 255))
+                ventana.blit(s, (constantes.ANCHO_VENTANA // 2 - s.get_width() // 2,
+                                 y_inicio + i * (fuente_boton.get_height() + 10)))
+
+        if intro_fade_saliendo:
+            ultimo = fuente_boton.render(intro_textos[-1], True, (255, 255, 255))
+            alpha_texto = max(0, 255 - intro_fade_alpha)
+            ultimo.set_alpha(alpha_texto)
+            ventana.blit(ultimo, (
+                constantes.ANCHO_VENTANA // 2 - ultimo.get_width() // 2,
+                constantes.ALTO_VENTANA // 2 - ultimo.get_height() // 2
+            ))
+            intro_fade_alpha += 3
+            fade_surf = pygame.Surface((constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA))
+            fade_surf.fill((0, 0, 0))
+            fade_surf.set_alpha(min(intro_fade_alpha, 255))
+            ventana.blit(fade_surf, (0, 0))
+            if intro_fade_alpha >= 255:
+                estado_juego = "jugando"
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                    intro_fade_saliendo = True
+
+        # dibujar texto actual (siempre visible mientras no fade completo)
+        if not intro_fade_saliendo:
+            # texto con wrap manual por si es largo
+            palabras = intro_texto_visible.split(" ")
+            lineas_render = []
+            linea_temp = ""
+            for palabra in palabras:
+                test = linea_temp + palabra + " "
+                if fuente_boton.size(test)[0] > constantes.ANCHO_VENTANA - 200:
+                    lineas_render.append(linea_temp)
+                    linea_temp = palabra + " "
+                else:
+                    linea_temp = test
+            lineas_render.append(linea_temp)
+
+            total_h = len(lineas_render) * (fuente_boton.get_height() + 10)
+            y_inicio = constantes.ALTO_VENTANA // 2 - total_h // 2
+            for i, lr in enumerate(lineas_render):
+                s = fuente_boton.render(lr, True, (255, 255, 255))
+                ventana.blit(s, (constantes.ANCHO_VENTANA // 2 - s.get_width() // 2, y_inicio + i * (fuente_boton.get_height() + 10)))
+
+        if intro_fade_saliendo:
+            # mostrar ultimo texto desvaneciéndose
+            ultimo = fuente_boton.render(intro_textos[-1], True, (255, 255, 255))
+            alpha_texto = max(0, 255 - intro_fade_alpha)
+            ultimo.set_alpha(alpha_texto)
+            ventana.blit(ultimo, (
+                constantes.ANCHO_VENTANA // 2 - ultimo.get_width() // 2,
+                constantes.ALTO_VENTANA // 2 - ultimo.get_height() // 2
+            ))
+
+            intro_fade_alpha += 3
+            fade_surf = pygame.Surface((constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA))
+            fade_surf.fill((0, 0, 0))
+            fade_surf.set_alpha(min(intro_fade_alpha, 255))
+            ventana.blit(fade_surf, (0, 0))
+
+            if intro_fade_alpha >= 255:
+                estado_juego = "jugando"
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                    intro_fade_saliendo = True
     
     elif estado_juego == "jugando":
 
@@ -552,6 +690,7 @@ while run == True:
         if mapas.mapa_actual == 1:
             bus.mover()
             bus.animar()
+            bus.dibujar(ventana)
             if jugador.forma.colliderect(bus.rect):
                 velocidad_actual = 2
 
@@ -569,15 +708,21 @@ while run == True:
             if mapas.mapa_actual == 1 and jugador.forma.colliderect(salida):
                 mapas.mapa_actual = 2
                 posicionar_jugador_entrada(mapas.salida_mapa2, "arriba", jugador)
+                if musica_actual == MUSICA_INTRO:
+                    reproducir_musica(MUSICA_JUEGO)
+                    musica_actual = MUSICA_JUEGO
                 cooldown_mapa = 30
                 cambio_mapa = True
-            elif mapas.mapa_actual == 2:
-                if jugador.forma.colliderect(salida):
-                    mapas.mapa_actual = 1
-                    posicionar_jugador_entrada(mapas.salida_mapa1, "abajo", jugador)
-                    cooldown_mapa = 30
-                    cambio_mapa = True
-                elif jugador.forma.colliderect(salida_abajo):
+        elif mapas.mapa_actual == 2:
+            if jugador.forma.colliderect(salida):
+                mapas.mapa_actual = 1
+                posicionar_jugador_entrada(mapas.salida_mapa1, "abajo", jugador)
+                if musica_actual != MUSICA_INTRO:
+                    reproducir_musica(MUSICA_INTRO, inicio=36)
+                    musica_actual = MUSICA_INTRO
+                cooldown_mapa = 30
+                cambio_mapa = True
+            elif jugador.forma.colliderect(salida_abajo):
                     mapas.mapa_actual = 3
                     posicionar_jugador_entrada(mapas.salida_mapa3, "arriba", jugador)
                     cooldown_mapa = 30
@@ -682,9 +827,8 @@ while run == True:
                 posicionar_jugador_entrada(mapas.salida_mapa3_derecha, "derecha", jugador)
                 cooldown_mapa = 30
                 cambio_mapa = True
-
         if cambio_mapa:
-            # === FADE OUT (oscurecer suave) ===
+            # FADE OUT (oscurecer suave) 
             for alpha in range(0, 256, 12):
                 ventana.fill((0, 0, 0))
                 overlay = pygame.Surface((constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA))
@@ -700,6 +844,8 @@ while run == True:
             mover_arriba = mover_abajo = mover_izquierda = mover_derecha = False
             paredes, salida, salida_izquierda, salida_abajo = obtener_variables_mapa(mapas.mapa_actual)
             pygame.time.wait(30)
+
+            
             
             # === FADE IN (desvanecimiento inverso suave) ===
             for alpha in range(255, -1, -12):
@@ -735,6 +881,7 @@ while run == True:
                 pantalla.blit(escalado, (0, 0))
                 pygame.display.update()
                 pygame.time.wait(30)
+        cambio_mapa = False
        
         if mapas.mapa_actual == 1:
 
@@ -1121,10 +1268,33 @@ while run == True:
                     mouse_real[1] * constantes.ALTO_VENTANA // constantes.ALTO_PANTALLA
                 )
                 if boton_jugar.collidepoint(mouse_pos):
-                    reproducir_musica(MUSICA_JUEGO)
-                    musica_actual = MUSICA_JUEGO
-                    estado_juego = "jugando"
+                    sonido_boton.play()
+                    # fade negro antes de la intro
+                    for alpha in range(0, 256, 8):
+                        ventana.fill((0, 0, 0))
+                        fade = pygame.Surface((constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA))
+                        fade.fill((0, 0, 0))
+                        fade.set_alpha(alpha)
+                        ventana.blit(fade, (0, 0))
+                        escalado = pygame.transform.scale(ventana, (constantes.ANCHO_PANTALLA, constantes.ALTO_PANTALLA))
+                        pantalla.blit(escalado, (0, 0))
+                        pygame.display.update()
+                        pygame.time.wait(15)
+                    reproducir_musica(MUSICA_INTRO)
+                    musica_actual = MUSICA_INTRO
+                    estado_juego = "intro"
+                    cambio_mapa = False
+                    cooldown_mapa = 30
+                    intro_linea_actual = 0
+                    intro_char_actual = 0
+                    intro_texto_visible = ""
+                    intro_timer = 0
+                    intro_espera = 0
+                    intro_fade_alpha = 0
+                    intro_fade_saliendo = False
+
                 elif boton_salir.collidepoint(mouse_pos):
+                    sonido_boton.play()
                     run = False
 
         if estado_juego == "jugando":
