@@ -52,8 +52,10 @@ mapa8_img = pygame.image.load(
 
 #LOGO ULAGOS
 ulagos_img = pygame.image.load(
-    "assets/images/objects/Letras_ulagos.png"
+    "assets/images/objects/Letras_ulagos_cut.png"
 )
+print("Tamaño:", ulagos_img.get_size())
+print("Área visible:", ulagos_img.get_bounding_rect())
 
 
 #Mapa del patio central
@@ -65,7 +67,7 @@ paredes_mapa1 = [
     pygame.Rect(1200, constantes.ALTO_VENTANA - 40, 720, 40),
 
     # arboleda de flores amarillas (zona oscura izquierda) - límite total
-    pygame.Rect(0, 0, 900, 800),
+    pygame.Rect(0, 0, 890, 790),
 
     # paradero (caseta azul)
     pygame.Rect(1165, 40, 290, 330),
@@ -78,37 +80,37 @@ salida_mapa1 = pygame.Rect(700, constantes.ALTO_VENTANA - 40, 500, 40)
 
 # mapa 2: primera zona verde
 paredes_mapa2 = [
-    pygame.Rect(0, 0, 700, 40),
-    pygame.Rect(1200, 0, constantes.ANCHO_VENTANA - 1200, 40),
+    pygame.Rect(0, 0, 120, 40),
+    pygame.Rect(500, 0, 2000, 40),
     pygame.Rect(0, 0, 40, constantes.ALTO_VENTANA),
     pygame.Rect(constantes.ANCHO_VENTANA - 40, 0, 40, constantes.ALTO_VENTANA),
 
-    pygame.Rect(800, 600, 300, 200), #logo ulagos
+    pygame.Rect(540, 600, 840, 252), #logo ulagos
 ]
 
 # puerta superior a INICIO
-salida_mapa2 = pygame.Rect(700, 0, 500, 40)
+salida_mapa2 = pygame.Rect(0, 0, 500, 40)
 
 # salida inferior a segunda zona verde: toda la anchura libre en el borde inferior
 salida_mapa2_abajo = pygame.Rect(0, constantes.ALTO_VENTANA - 40, constantes.ANCHO_VENTANA, 40)
 
 # segunda zona verde
 paredes_mapa3 = [
-    pygame.Rect(0, 0, 40, 420),
-    pygame.Rect(0, 680, 40, constantes.ALTO_VENTANA - 680),
-    pygame.Rect(constantes.ANCHO_VENTANA - 40, 0, 40, 420),
-    pygame.Rect(constantes.ANCHO_VENTANA - 40, 680, 40, constantes.ALTO_VENTANA - 680),
-    pygame.Rect(0, constantes.ALTO_VENTANA - 40, constantes.ANCHO_VENTANA, 40)
+    pygame.Rect(0, 60, 100, 420),
+    pygame.Rect(0, 750, 100, 420),
+    pygame.Rect(1810, 0, 40, 420),
+    pygame.Rect(1810, 680, 40, 400),
+    pygame.Rect(0, 1040, 1920, 40)
 ]
 
 # salida superior a mapa 2
 salida_mapa3 = pygame.Rect(0, 0, constantes.ANCHO_VENTANA, 40)
 
 # salida izquierda a nuevo mapa 4
-salida_mapa3_izquierda = pygame.Rect(0, 320, 40, 440)
+salida_mapa3_izquierda = pygame.Rect(80, 530, 100, 300)
 
 # salida derecha a nuevo mapa 7
-salida_mapa3_derecha = pygame.Rect(constantes.ANCHO_VENTANA - 40, 420, 40, 260)
+salida_mapa3_derecha = pygame.Rect(constantes.ANCHO_VENTANA - 110, 530, 100, 300)
 
 # salida inferior a nuevo mapa 8
 salida_mapa3_abajo = pygame.Rect(0, constantes.ALTO_VENTANA - 40, constantes.ANCHO_VENTANA, 40)

@@ -31,11 +31,10 @@ boton_musica = pygame.Rect(0, 0, 0, 0)
 boton_menu = pygame.Rect(0, 0, 0, 0)
 boton_salir_juego = pygame.Rect(0, 0, 0, 0)
 
-logo_ulagos = pygame.transform.scale(
-mapas.ulagos_img,
-(300, 200)
+logo_ulagos = pygame.transform.smoothscale(
+    mapas.ulagos_img,
+    (840, 252)
 )
-
 
 def reproducir_musica(ruta, loop=-1, inicio=0):
     pygame.mixer.music.load(ruta)
@@ -304,7 +303,7 @@ def dibujar_menu_pausa(ventana):
     )
 
     panel = pygame.Surface((caja.width,caja.height),pygame.SRCALPHA)
-    panel.fill((10,10,30,220))
+    panel.fill((0, 0, 0, 220))
     ventana.blit(panel,(caja.x,caja.y))
 
     pygame.draw.rect(ventana,(100,140,255),caja,4)
@@ -340,10 +339,10 @@ def dibujar_menu_pausa(ventana):
 
     for rect,texto in botones:
 
-        color=(50,70,130)
+        color = (15, 15, 15)
 
         if rect.collidepoint(mouse):
-            color=(90,120,220)
+            color = (35, 35, 35)
 
         pygame.draw.rect(ventana,color,rect)
         pygame.draw.rect(ventana,(100,140,255),rect,3)
@@ -941,13 +940,19 @@ while run == True:
                     ventana.blit(mapa1_img, (MAPA1_OFFSET_X - camera_x, MAPA1_OFFSET_Y - camera_y))
                 elif mapas.mapa_actual == 2:
 
-                    ventana.fill((0,0,0))
-                    ventana.blit(mapas.mapa2_img,(0,0))
+                    camera_x = 0
+                    camera_y = 0
+
+                    ventana.fill((0, 0, 0))
+                    ventana.blit(mapas.mapa2_img, (0, 0))
 
                 elif mapas.mapa_actual == 3:
 
-                    ventana.fill((0,0,0))
-                    ventana.blit(mapas.mapa3_img,(0,0))
+                    camera_x = 0
+                    camera_y = 0
+
+                    ventana.fill((0, 0, 0))
+                    ventana.blit(mapas.mapa3_img, (0, 0))
                     
                 elif mapas.mapa_actual == 4:
                     camera_x = max(MAPA4_OFFSET_X, min(jugador.forma.centerx - constantes.ANCHO_VENTANA // 2, MAPA4_OFFSET_X + mapa4_w - constantes.ANCHO_VENTANA))
@@ -968,6 +973,7 @@ while run == True:
                 
                 # Overlay fade in
                 overlay = pygame.Surface((constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA))
+
                 overlay.fill((0, 0, 0))
                 overlay.set_alpha(alpha)
                 ventana.blit(overlay, (0, 0))
@@ -1010,7 +1016,21 @@ while run == True:
                     tutorial_alpha = 255
                 dibujar_teclas_tutorial(ventana, tutorial_alpha)
 
+        elif mapas.mapa_actual == 2:
 
+            camera_x = 0
+            camera_y = 0
+
+            ventana.fill((0, 0, 0))
+            ventana.blit(mapas.mapa2_img, (0, 0))
+
+        elif mapas.mapa_actual == 3:
+
+            camera_x = 0
+            camera_y = 0
+
+            ventana.fill((0, 0, 0))
+            ventana.blit(mapas.mapa3_img, (0, 0))
         elif mapas.mapa_actual == 4:
 
             # Cámara mapa 4
@@ -1148,9 +1168,10 @@ while run == True:
                     reproducir_musica(MUSICA_MINIJUEGO)
                     musica_actual = MUSICA_MINIJUEGO
                 paredes = []
-                dt = reloj.get_time() / 1000.0
-                tiempo_minijuego -= dt
-                libro_timer -= dt
+                if not pausa:
+                    dt = reloj.get_time() / 1000.0
+                    tiempo_minijuego -= dt
+                    libro_timer -= dt
 
                 if libro_iluminado == -1:
                     libro_iluminado = random.randint(0, len(libros_hitboxes) - 1)
@@ -1207,12 +1228,12 @@ while run == True:
 
         if mapas.mapa_actual == 2:
 
-            ventana.blit(logo_ulagos, (800, 600))    
+            ventana.blit(logo_ulagos, (540, 600))    
 
                 # dibujar paredes mas colisiones
         for pared in paredes:
             # No dibujar paredes grises en mapas con imagen grande
-            if mapas.mapa_actual not in (1, 4, 5, 6, 7, 10):
+            if mapas.mapa_actual not in (1, 2, 3, 4, 5, 6, 7, 10):
                 pygame.draw.rect(ventana, (150, 150, 150), pared)
 
             # Mostrar hitbox ROJA siempre con offset de cámara en mapas grandes
@@ -1347,8 +1368,11 @@ while run == True:
                         3
                     )
                     
+    if pausa:
+        dibujar_menu_pausa(ventana)
 
-    
+                #AAA
+                                   
 
     for event in pygame.event.get():
         # cerrar ventana
@@ -1371,6 +1395,7 @@ while run == True:
                         fade.fill((0, 0, 0))
                         fade.set_alpha(alpha)
                         ventana.blit(fade, (0, 0))
+
                         escalado = pygame.transform.scale(ventana, (constantes.ANCHO_PANTALLA, constantes.ALTO_PANTALLA))
                         pantalla.blit(escalado, (0, 0))
                         pygame.display.update()
@@ -1399,6 +1424,40 @@ while run == True:
                     mouse_real[0] * constantes.ANCHO_VENTANA // constantes.ANCHO_PANTALLA,
                     mouse_real[1] * constantes.ALTO_VENTANA // constantes.ALTO_PANTALLA
                 )
+                if pausa:
+
+                    mouse_real = event.pos
+
+                    mouse_pos = (
+                        mouse_real[0] * constantes.ANCHO_VENTANA // constantes.ANCHO_PANTALLA,
+                        mouse_real[1] * constantes.ALTO_VENTANA // constantes.ALTO_PANTALLA
+                    )
+
+                    if boton_reanudar.collidepoint(mouse_pos):
+                        pausa = False
+
+                    elif boton_musica.collidepoint(mouse_pos):
+
+                        if musica_silenciada:
+                            pygame.mixer.music.unpause()
+                            musica_silenciada = False
+                        else:
+                            pygame.mixer.music.pause()
+                            musica_silenciada = True
+
+                    elif boton_menu.collidepoint(mouse_pos):
+
+                        pausa = False
+                        estado_juego = "menu"
+
+                        reproducir_musica(MUSICA_MENU)
+                        musica_actual = MUSICA_MENU
+
+                    elif boton_salir_juego.collidepoint(mouse_pos):
+                        run = False
+
+                    continue
+
                 if minijuego_instructivo:
                     if boton_iniciar.collidepoint(mouse_pos):
                         minijuego_instructivo = False
@@ -1430,7 +1489,10 @@ while run == True:
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
-                   pausa = not pausa
+
+                    if not dialogo_joel_activo and not dialogo_segovia_activo:
+                        pausa = not pausa
+
                 if event.key == pygame.K_c:
                     mostrar_hitbox = not mostrar_hitbox
                 if event.key == pygame.K_a or event.key == pygame.K_LEFT:
