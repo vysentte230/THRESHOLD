@@ -1,6 +1,5 @@
 import os
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
 import pygame
 import math
 import constantes
@@ -22,6 +21,15 @@ MUSICA_MAPA7 = "assets//music//musica//biblioteca_ost.mp3"
 MUSICA_MINIJUEGO = "assets//music//musica//chill_game.mp3"
 musica_actual = MUSICA_MENU
 musica_anterior = None
+
+#esto es para el boton de pausa
+pausa = False
+musica_silenciada = False
+
+boton_reanudar = pygame.Rect(0, 0, 0, 0)
+boton_musica = pygame.Rect(0, 0, 0, 0)
+boton_menu = pygame.Rect(0, 0, 0, 0)
+boton_salir_juego = pygame.Rect(0, 0, 0, 0)
 
 logo_ulagos = pygame.transform.scale(
 mapas.ulagos_img,
@@ -280,6 +288,75 @@ def dibujar_dialogo_segovia(ventana, texto, pagina, total):
     else:
         ind = fuente_dialogo.render("[ E ] Cerrar", True, (255, 150, 150))
     ventana.blit(ind, (caja.right - 320, caja.bottom - 36))
+
+def dibujar_menu_pausa(ventana):
+
+    fondo = pygame.Surface((constantes.ANCHO_VENTANA,
+                            constantes.ALTO_VENTANA), pygame.SRCALPHA)
+    fondo.fill((0,0,0,120))
+    ventana.blit(fondo,(0,0))
+
+    caja = pygame.Rect(
+        constantes.ANCHO_VENTANA//2-280,
+        constantes.ALTO_VENTANA//2-220,
+        560,
+        440
+    )
+
+    panel = pygame.Surface((caja.width,caja.height),pygame.SRCALPHA)
+    panel.fill((10,10,30,220))
+    ventana.blit(panel,(caja.x,caja.y))
+
+    pygame.draw.rect(ventana,(100,140,255),caja,4)
+
+    titulo = fuente_nombre.render("PAUSA",True,(180,220,255))
+    ventana.blit(titulo,
+    (caja.centerx-titulo.get_width()//2,caja.y+20))
+
+    global boton_reanudar
+    global boton_musica
+    global boton_menu
+    global boton_salir_juego
+
+    boton_reanudar = pygame.Rect(caja.x+80,caja.y+90,400,50)
+    boton_musica = pygame.Rect(caja.x+80,caja.y+160,400,50)
+    boton_menu = pygame.Rect(caja.x+80,caja.y+230,400,50)
+    boton_salir_juego = pygame.Rect(caja.x+80,caja.y+300,400,50)
+
+    mouse = pygame.mouse.get_pos()
+
+    mouse = (
+        mouse[0]*constantes.ANCHO_VENTANA//constantes.ANCHO_PANTALLA,
+        mouse[1]*constantes.ALTO_VENTANA//constantes.ALTO_PANTALLA
+    )
+
+    botones = [
+        (boton_reanudar,"REANUDAR"),
+        (boton_musica,
+        "ACTIVAR MUSICA" if musica_silenciada else "SILENCIAR MUSICA"),
+        (boton_menu,"VOLVER AL MENU"),
+        (boton_salir_juego,"CERRAR JUEGO")
+    ]
+
+    for rect,texto in botones:
+
+        color=(50,70,130)
+
+        if rect.collidepoint(mouse):
+            color=(90,120,220)
+
+        pygame.draw.rect(ventana,color,rect)
+        pygame.draw.rect(ventana,(100,140,255),rect,3)
+
+        txt=fuente_dialogo.render(texto,True,(255,255,255))
+
+        ventana.blit(
+            txt,
+            (
+                rect.centerx-txt.get_width()//2,
+                rect.centery-txt.get_height()//2
+            )
+        )
 
 def dibujar_instructivo_biblioteca(ventana):
     fondo = pygame.Surface((constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA), pygame.SRCALPHA)
@@ -669,7 +746,7 @@ while run == True:
         delta_x = 0
         delta_y = 0
 
-        if not dialogo_joel_activo and not dialogo_segovia_activo and not minijuego_activo and not minijuego_instructivo:
+        if not pausa and not dialogo_joel_activo and not dialogo_segovia_activo and not minijuego_activo and not minijuego_instructivo:
             if teclas[pygame.K_w] or teclas[pygame.K_UP]:
                 delta_y = -velocidad_actual
 
@@ -705,28 +782,36 @@ while run == True:
         # cambiar mapa
         cambio_mapa = False
         if cooldown_mapa == 0:
-            if mapas.mapa_actual == 1 and jugador.forma.colliderect(salida):
-                mapas.mapa_actual = 2
-                posicionar_jugador_entrada(mapas.salida_mapa2, "arriba", jugador)
-                if musica_actual == MUSICA_INTRO:
-                    reproducir_musica(MUSICA_JUEGO)
-                    musica_actual = MUSICA_JUEGO
-                cooldown_mapa = 30
-                cambio_mapa = True
-        elif mapas.mapa_actual == 2:
-            if jugador.forma.colliderect(salida):
-                mapas.mapa_actual = 1
-                posicionar_jugador_entrada(mapas.salida_mapa1, "abajo", jugador)
-                if musica_actual != MUSICA_INTRO:
-                    reproducir_musica(MUSICA_INTRO, inicio=36)
-                    musica_actual = MUSICA_INTRO
-                cooldown_mapa = 30
-                cambio_mapa = True
-            elif jugador.forma.colliderect(salida_abajo):
-                    mapas.mapa_actual = 3
-                    posicionar_jugador_entrada(mapas.salida_mapa3, "arriba", jugador)
+
+            if mapas.mapa_actual == 1:
+
+                if jugador.forma.colliderect(salida):
+
+                    mapas.mapa_actual = 2
+                    posicionar_jugador_entrada(mapas.salida_mapa2, "arriba", jugador)
+
                     cooldown_mapa = 30
                     cambio_mapa = True
+
+
+            elif mapas.mapa_actual == 2:
+
+                if jugador.forma.colliderect(salida):
+
+                    mapas.mapa_actual = 1
+                    posicionar_jugador_entrada(mapas.salida_mapa1, "abajo", jugador)
+
+                    cooldown_mapa = 30
+                    cambio_mapa = True
+
+                elif jugador.forma.colliderect(salida_abajo):
+
+                    mapas.mapa_actual = 3
+                    posicionar_jugador_entrada(mapas.salida_mapa3, "arriba", jugador)
+
+                    cooldown_mapa = 30
+                    cambio_mapa = True
+
             elif mapas.mapa_actual == 3:
                 if jugador.forma.colliderect(salida):
                     mapas.mapa_actual = 2
@@ -854,6 +939,16 @@ while run == True:
                     camera_x = max(MAPA1_OFFSET_X, min(jugador.forma.centerx - constantes.ANCHO_VENTANA // 2, MAPA1_OFFSET_X + mapa1_w - constantes.ANCHO_VENTANA))
                     camera_y = max(MAPA1_OFFSET_Y, min(jugador.forma.centery - constantes.ALTO_VENTANA // 2, MAPA1_OFFSET_Y + mapa1_h - constantes.ALTO_VENTANA))
                     ventana.blit(mapa1_img, (MAPA1_OFFSET_X - camera_x, MAPA1_OFFSET_Y - camera_y))
+                elif mapas.mapa_actual == 2:
+
+                    ventana.fill((0,0,0))
+                    ventana.blit(mapas.mapa2_img,(0,0))
+
+                elif mapas.mapa_actual == 3:
+
+                    ventana.fill((0,0,0))
+                    ventana.blit(mapas.mapa3_img,(0,0))
+                    
                 elif mapas.mapa_actual == 4:
                     camera_x = max(MAPA4_OFFSET_X, min(jugador.forma.centerx - constantes.ANCHO_VENTANA // 2, MAPA4_OFFSET_X + mapa4_w - constantes.ANCHO_VENTANA))
                     camera_y = max(MAPA4_OFFSET_Y, min(jugador.forma.centery - constantes.ALTO_VENTANA // 2, MAPA4_OFFSET_Y + mapa4_h - constantes.ALTO_VENTANA))
@@ -1334,6 +1429,8 @@ while run == True:
 
             
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                   pausa = not pausa
                 if event.key == pygame.K_c:
                     mostrar_hitbox = not mostrar_hitbox
                 if event.key == pygame.K_a or event.key == pygame.K_LEFT:

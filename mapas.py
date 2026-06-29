@@ -8,14 +8,19 @@ mapa1_img = pygame.image.load(
     "assets/images/Map/Paradero.png"
 )
 
-#DONDE ESTAN LAS LETRAS ULAGOS
-mapa2_img = pygame.image.load(
-    "assets/images/Map/Entrada_universidad.png"
+mapa2_img = pygame.transform.scale(
+    pygame.image.load(
+        "assets/images/Map/Entrada_universidad.png"
+    ),
+    (constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA)
 )
 
 #SI
-mapa3_img = pygame.image.load(
-    "assets/images/Map/Entrada_u2.png"
+mapa3_img = pygame.transform.scale(
+    pygame.image.load(
+        "assets/images/Map/Entrada_u2.png"
+    ),
+    (constantes.ANCHO_VENTANA, constantes.ALTO_VENTANA)
 )
 
 #este es el mapa4 ENTRADA EDIFICIO IZQUIERDO
