@@ -12,6 +12,15 @@ from segovia import Segovia
 
 
 pygame.init()
+pygame.joystick.init()
+
+joystick = None
+if pygame.joystick.get_count() > 0:
+    joystick = pygame.joystick.Joystick(0)
+    joystick.init()
+    print(f"Mando detectado: {joystick.get_name()}")
+
+ultimo_dispositivo = "teclado"
 pygame.mixer.init()
 
 MUSICA_MENU = "assets//music//musica//Titulo_chill.mp3"
@@ -685,6 +694,9 @@ while run == True:
             if event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_RETURN, pygame.K_SPACE):
                     intro_fade_saliendo = True
+            if event.type == pygame.JOYBUTTONDOWN:
+                if event.button == 0:   # A del Xbox
+                    intro_fade_saliendo = True         
 
         # dibujar texto actual (siempre visible mientras no fade completo)
         if not intro_fade_saliendo:
@@ -740,20 +752,44 @@ while run == True:
         velocidad_actual = constantes.VELOCIDAD
 
         teclas = pygame.key.get_pressed()
+
+        arriba = teclas[pygame.K_w] or teclas[pygame.K_UP]
+        abajo = teclas[pygame.K_s] or teclas[pygame.K_DOWN]
+        izquierda = teclas[pygame.K_a] or teclas[pygame.K_LEFT]
+        derecha = teclas[pygame.K_d] or teclas[pygame.K_RIGHT]
+
+        # Si hay un mando conectado, leer el stick izquierdo
+        if joystick:
+
+            eje_x = joystick.get_axis(0)
+            eje_y = joystick.get_axis(1)
+
+            # Zona muerta para evitar movimiento involuntario
+            if eje_x < -0.3:
+                izquierda = True
+            elif eje_x > 0.3:
+                derecha = True
+
+            if eje_y < -0.3:
+                arriba = True
+            elif eje_y > 0.3:
+                abajo = True
+
         delta_x = 0
         delta_y = 0
 
         if not pausa and not dialogo_joel_activo and not dialogo_segovia_activo and not minijuego_activo and not minijuego_instructivo:
-            if teclas[pygame.K_w] or teclas[pygame.K_UP]:
+
+            if arriba:
                 delta_y = -velocidad_actual
 
-            if teclas[pygame.K_s] or teclas[pygame.K_DOWN]:
+            if abajo:
                 delta_y = velocidad_actual
 
-            if teclas[pygame.K_a] or teclas[pygame.K_LEFT]:
+            if izquierda:
                 delta_x = -velocidad_actual
 
-            if teclas[pygame.K_d] or teclas[pygame.K_RIGHT]:
+            if derecha:
                 delta_x = velocidad_actual
 
         salida_abajo = None
@@ -1395,6 +1431,15 @@ while run == True:
                                    
 
     for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            ultimo_dispositivo = "teclado"
+
+        if event.type == pygame.JOYBUTTONDOWN:
+            ultimo_dispositivo = "mando"
+
+        if event.type == pygame.JOYAXISMOTION:
+            if abs(event.value) > 0.3:
+                ultimo_dispositivo = "mando"
         # cerrar ventana
         if event.type == pygame.QUIT:
             run = False
