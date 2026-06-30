@@ -265,57 +265,27 @@ paredes_mapa7 = [
 # Salidas (azul) - ajusta según necesites
 salida_mapa7 = pygame.Rect(140, 420, 40, 260)           # salida izquierda (volver a mapa 3)
 salida_mapa7_abajo = pygame.Rect(1440, 2110, 480, 40)  # salida inferior (hacia mapa 8 segundo piso)
+salida_mapa7_segundo_piso = pygame.Rect(1100, 600, 100, 30)    # salida hacia el segundo piso (arriba de la escalera1)
 
-# nuevo mapa 9: zona debajo de mapa 7
-paredes_mapa9 = [
-    pygame.Rect(0, 0, 40, constantes.ALTO_VENTANA),
-    pygame.Rect(constantes.ANCHO_VENTANA - 40, 0, 40, constantes.ALTO_VENTANA),
-    pygame.Rect(40, 0, 1440, 40),
-    pygame.Rect(0, constantes.ALTO_VENTANA - 40, constantes.ANCHO_VENTANA, 40),
-    pygame.Rect(1600, 700, 320, 380)
-]
 
-# entrada superior de retorno a mapa 7
-salida_mapa9 = pygame.Rect(1440, 0, 480, 40)
+# mapa 8: segundo piso (encima de mapa 7, cámara libre)
+MAPA8_ANCHO = 396 * 8
+MAPA8_ALTO = 216 * 8
 
-# mapa 8: nueva zona abajo de mapa 3
+mapa8_img_full = pygame.transform.scale(
+    mapa8_img,
+    (MAPA8_ANCHO, MAPA8_ALTO)
+)
+
 paredes_mapa8 = [
-    pygame.Rect(0, 0, 40, constantes.ALTO_VENTANA),
-    pygame.Rect(constantes.ANCHO_VENTANA - 40, 0, 40, constantes.ALTO_VENTANA),
-    pygame.Rect(0, 0, 1120, 40),
-    pygame.Rect(1380, 0, constantes.ANCHO_VENTANA - 1380, 40),
-    pygame.Rect(0, constantes.ALTO_VENTANA - 40, constantes.ANCHO_VENTANA, 40)
+    pygame.Rect(0, 0, MAPA8_ANCHO, 40),
+    pygame.Rect(0, 0, 40, MAPA8_ALTO),
+    pygame.Rect(MAPA8_ANCHO - 40, 0, 40, MAPA8_ALTO),
+    pygame.Rect(0, MAPA8_ALTO - 40, MAPA8_ANCHO, 40),
 ]
 
-# salida superior de retorno a mapa 3
-salida_mapa8 = pygame.Rect(1120, 0, 260, 40)
+# salida de retorno hacia la escalera del mapa 7
+salida_mapa8 = pygame.Rect(80, MAPA8_ALTO - 200, 200, 160)
 
-paredes_edificio = [
-
-    pygame.Rect(0, 0, 600, 20),      # arriba
-    pygame.Rect(0, 0, 20, 216),      # izquierda
-    pygame.Rect(580, 0, 20, 216),    # derecha
-    pygame.Rect(0, 196, 600, 20)     # abajo
-
-]
-
-puerta_izquierda = pygame.Rect(
-    0,
-    80,
-    20,
-    60
-)
-
-puerta_derecha = pygame.Rect(
-    580,
-    80,
-    20,
-    60
-)
-
-puerta_arriba = pygame.Rect(
-    260,
-    0,
-    80,
-    20
-)
+# salida hacia el segundo piso (arriba de la escalera1 en mapa 7)
+salida_mapa7_segundo_piso = pygame.Rect(800, 700, 300, 100)

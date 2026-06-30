@@ -176,13 +176,17 @@ mapa7_img = pygame.transform.scale(
 )
 mapa7_w, mapa7_h = mapa7_img.get_size()
 
+MAPA8_OFFSET_X = 0
+MAPA8_OFFSET_Y = 0
+mapa8_w, mapa8_h = mapas.mapa8_img_full.get_size()
+
 estado_juego = "menu"
 
 # Intro
 intro_textos = [
     "Saludos, veo que eres nuevo por aqui.",
     "Eso es bueno, muy bueno.",
-    "Veo que te dirijes a la universidad, se te nota.",
+    "parece que te dirijes a la universidad, se te nota.",
     "pero tranquilo, no pongas esa cara.",
     "Apenas ni pusiste un pie en el lugar.",
     "No pasa nada es normal, nadie es capaz de saber",
@@ -499,12 +503,6 @@ def obtener_variables_mapa(mapa):
     elif mapa == 8:
         paredes = mapas.paredes_mapa8
         salida = mapas.salida_mapa8
-    elif mapa == 9:
-        paredes = mapas.paredes_mapa9
-        salida = mapas.salida_mapa9
-    elif mapa == 10:
-        paredes = mapas.paredes_edificio
-        salida = mapas.puerta_izquierda
     else:
         paredes = mapas.paredes_mapa1
         salida = mapas.salida_mapa1
@@ -785,10 +783,11 @@ while run == True:
             if mapas.mapa_actual == 1:
 
                 if jugador.forma.colliderect(salida):
-
                     mapas.mapa_actual = 2
                     posicionar_jugador_entrada(mapas.salida_mapa2, "arriba", jugador)
-
+                    if musica_actual == MUSICA_INTRO:
+                        reproducir_musica(MUSICA_JUEGO)
+                        musica_actual = MUSICA_JUEGO
                     cooldown_mapa = 30
                     cambio_mapa = True
 
@@ -796,10 +795,11 @@ while run == True:
             elif mapas.mapa_actual == 2:
 
                 if jugador.forma.colliderect(salida):
-
                     mapas.mapa_actual = 1
                     posicionar_jugador_entrada(mapas.salida_mapa1, "abajo", jugador)
-
+                    if musica_actual != MUSICA_INTRO:
+                        reproducir_musica(MUSICA_INTRO, inicio=36)
+                        musica_actual = MUSICA_INTRO
                     cooldown_mapa = 30
                     cambio_mapa = True
 
@@ -832,9 +832,10 @@ while run == True:
                         musica_actual = MUSICA_MAPA7
                     cooldown_mapa = 30
                     cambio_mapa = True
-                elif jugador.forma.colliderect(salida_abajo):
+                elif mapas.mapa_actual == 7 and jugador.forma.colliderect(mapas.salida_mapa7_segundo_piso):
                     mapas.mapa_actual = 8
-                    posicionar_jugador_entrada(mapas.salida_mapa8, "arriba", jugador)
+                    jugador.forma.centerx = 180
+                    jugador.forma.centery = mapas.MAPA8_ALTO - 300
                     cooldown_mapa = 30
                     cambio_mapa = True
             elif mapas.mapa_actual == 4:
@@ -886,29 +887,14 @@ while run == True:
                     musica_anterior = None
                 cooldown_mapa = 30
                 cambio_mapa = True
-            elif mapas.mapa_actual == 7 and jugador.forma.colliderect(salida_abajo):
-                mapas.mapa_actual = 9
-                posicionar_jugador_entrada(mapas.salida_mapa9, "arriba", jugador)
-                # Salir de biblioteca - restaurar musica anterior
-                if musica_actual == MUSICA_MAPA7:
-                    reproducir_musica(musica_anterior or MUSICA_JUEGO)
-                    musica_actual = musica_anterior or MUSICA_JUEGO
-                    musica_anterior = None
+            elif mapas.mapa_actual == 7 and jugador.forma.colliderect(mapas.salida_mapa7_segundo_piso):
+                mapas.mapa_actual = 8
+                posicionar_jugador_entrada(mapas.salida_mapa8, "arriba", jugador)
                 cooldown_mapa = 30
                 cambio_mapa = True
             elif mapas.mapa_actual == 8 and jugador.forma.colliderect(salida):
-                mapas.mapa_actual = 3
-                posicionar_jugador_entrada(mapas.salida_mapa3_abajo, "abajo", jugador)
-                cooldown_mapa = 30
-                cambio_mapa = True
-            elif mapas.mapa_actual == 9 and jugador.forma.colliderect(salida):
                 mapas.mapa_actual = 7
-                posicionar_jugador_entrada(mapas.salida_mapa7, "izquierda", jugador)
-                cooldown_mapa = 30
-                cambio_mapa = True
-            elif mapas.mapa_actual == 10 and jugador.forma.colliderect(salida):
-                mapas.mapa_actual = 3
-                posicionar_jugador_entrada(mapas.salida_mapa3_derecha, "derecha", jugador)
+                posicionar_jugador_entrada(mapas.salida_mapa7_segundo_piso, "abajo", jugador)
                 cooldown_mapa = 30
                 cambio_mapa = True
         if cambio_mapa:
@@ -953,6 +939,7 @@ while run == True:
 
                     ventana.fill((0, 0, 0))
                     ventana.blit(mapas.mapa3_img, (0, 0))
+
                     
                 elif mapas.mapa_actual == 4:
                     camera_x = max(MAPA4_OFFSET_X, min(jugador.forma.centerx - constantes.ANCHO_VENTANA // 2, MAPA4_OFFSET_X + mapa4_w - constantes.ANCHO_VENTANA))
@@ -968,6 +955,10 @@ while run == True:
                     camera_x = max(MAPA7_OFFSET_X, min(jugador.forma.centerx - constantes.ANCHO_VENTANA // 2, MAPA7_OFFSET_X + mapa7_w - constantes.ANCHO_VENTANA))
                     camera_y = max(MAPA7_OFFSET_Y, min(jugador.forma.centery - constantes.ALTO_VENTANA // 2, MAPA7_OFFSET_Y + mapa7_h - constantes.ALTO_VENTANA))
                     ventana.blit(mapa7_img, (MAPA7_OFFSET_X - camera_x, MAPA7_OFFSET_Y - camera_y))
+                elif mapas.mapa_actual == 8:
+                    camera_x = max(MAPA8_OFFSET_X, min(jugador.forma.centerx - constantes.ANCHO_VENTANA // 2, MAPA8_OFFSET_X + mapa8_w - constantes.ANCHO_VENTANA))
+                    camera_y = max(MAPA8_OFFSET_Y, min(jugador.forma.centery - constantes.ALTO_VENTANA // 2, MAPA8_OFFSET_Y + mapa8_h - constantes.ALTO_VENTANA))
+                    ventana.blit(mapas.mapa8_img_full, (MAPA8_OFFSET_X - camera_x, MAPA8_OFFSET_Y - camera_y))
                 else:
                     ventana.fill((10, 10, 70))
                 
@@ -1031,7 +1022,24 @@ while run == True:
 
             ventana.fill((0, 0, 0))
             ventana.blit(mapas.mapa3_img, (0, 0))
+
+        elif mapas.mapa_actual == 8:
+            camera_x = max(
+                MAPA8_OFFSET_X,
+                min(camera_x, MAPA8_OFFSET_X + mapa8_w - constantes.ANCHO_VENTANA)
+            )
+            camera_y = max(
+                MAPA8_OFFSET_Y,
+                min(camera_y, MAPA8_OFFSET_Y + mapa8_h - constantes.ALTO_VENTANA)
+            )
+            ventana.fill((0, 0, 0))
+            ventana.blit(
+                mapas.mapa8_img_full,
+                (MAPA8_OFFSET_X - camera_x, MAPA8_OFFSET_Y - camera_y)
+            )
         elif mapas.mapa_actual == 4:
+
+            
 
             # Cámara mapa 4
             camera_x = jugador.forma.centerx - constantes.ANCHO_VENTANA // 2
@@ -1233,7 +1241,7 @@ while run == True:
                 # dibujar paredes mas colisiones
         for pared in paredes:
             # No dibujar paredes grises en mapas con imagen grande
-            if mapas.mapa_actual not in (1, 2, 3, 4, 5, 6, 7, 10):
+            if mapas.mapa_actual not in (1, 2, 3, 4, 5, 6, 7, 8):
                 pygame.draw.rect(ventana, (150, 150, 150), pared)
 
             # Mostrar hitbox ROJA siempre con offset de cámara en mapas grandes
@@ -1341,6 +1349,18 @@ while run == True:
                         ),
                         3
                     )
+
+                pygame.draw.rect(
+                    ventana,
+                    (255, 255, 0),
+                    pygame.Rect(
+                        mapas.salida_mapa7_segundo_piso.x - camera_x,
+                        mapas.salida_mapa7_segundo_piso.y - camera_y,
+                        mapas.salida_mapa7_segundo_piso.width,
+                        mapas.salida_mapa7_segundo_piso.height
+                    ),
+                    3
+                )
             else:
                 # Dibujar hitbox de salida principal para otros mapas
                 pygame.draw.rect(
